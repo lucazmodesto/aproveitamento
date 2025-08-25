@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reaproveitar Peças</title> <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #3B82F6; /* blue-500 */
+            --primary-hover: #2563EB; /* blue-600 */
+            --success-color: #16A34A; /* green-600 */
+            --background-light: #F9FAFB; /* gray-50 */
+            --border-color: #E5E7EB; /* gray-200 */
+        }
+        body { font-family: 'Inter', sans-serif; background-color: var(--background-light); }
+        .modal { transition: opacity 0.3s ease; }
+        .form-modal-content { max-height: 85vh; overflow-y: auto; }
+        .blueprint-text { font-size: 10px; font-family: monospace; fill: #1D4ED8; }
+        .blueprint-line { stroke: #1D4ED8; stroke-width: 0.5; }
+        .card {
+            background-color: white;
+            border: 1px solid var(--border-color);
+            border-radius: 0.75rem;
+            box-shadow: 0 1px 3px 0 rgba(0,0,0,0.05);
+            transition: all 0.2s ease-in-out;
+        }
+        .card:hover {
+            box-shadow: 0 4px 12px 0 rgba(0,0,0,0.08);
+            transform: translateY(-2px);
+        }
+        .btn {
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .btn-primary { background-color: var(--primary-color); color: white; }
+        .btn-primary:hover { background-color: var(--primary-hover); }
+        .btn-success { background-color: var(--success-color); color: white; }
+        .btn-success:hover { background-color: #15803D; }
+        .btn-secondary { background-color: #6B7280; color: white; }
+        .btn-secondary:hover { background-color: #4B5563; }
+
+        @media print {
+            body > *:not(#relatorio-container) { display: none; }
+            #relatorio-container { display: block; position: absolute; left: 0; top: 0; width: 100%; }
+            section, table { page-break-inside: avoid; }
+            @page { margin: 1.5cm; }
+        }
+    </style>
+</head>
+<body class="text-gray-800">
+
+    <div id="app-container" class="container mx-auto p-4 sm:p-6 lg:p-8">
+        <header class="mb-8 pb-4 border-b border-gray-200 flex justify-between items-center">
+            <div>
+                <h1 class="text-3xl md:text-4xl font-extrabold text-gray-900 flex items-center gap-3">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-blue-600" viewBox="0 0 20 20" fill="currentColor"><path d="M8 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1zM3.905 6.345a1 1 0 00-1.282 1.536l1.536 1.282a1 1 0 001.536-1.282L3.905 6.345zM15.543 6.095a1 1 0 010 1.536l-1.282 1.536a1 1 0 11-1.536-1.282l1.282-1.536a1 1 0 011.536 0zM8.5 5.5a1 1 0 100 2h3a1 1 0 100-2h-3zM12 10a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM4 10a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5 15a1 1 0 011-1h8a1 1 0 110 2H6a1 1 0 01-1-1z" /></svg>
+                    Reaproveitar Peças
+                </h1>
+                <p class="text-gray-500 mt-2">Selecione peças do estoque para compor seu pedido de corte.</p>
+            </div>
+            <div class="flex items-center gap-4">
+                <a href="index.html" class="btn btn-secondary no-print">
+                   <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                     <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" />
+                   </svg>
+                   Menu Principal
+                </a>
+                <button id="ranking-btn" class="btn bg-amber-400 text-amber-900 font-bold transition-transform hover:scale-105">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.196-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.783-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" /></svg>
+                    Ranking
+                </button>
+            </div>
+            </header>
+        
+        <div class="card p-5 mb-8 grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+                <label for="numero-pedido" class="block text-base font-bold text-gray-800">Número do Pedido / OS</label>
+                <input type="text" id="numero-pedido" name="numero-pedido" required class="mt-2 block w-full p-3 border border-gray-300 rounded-lg shadow-sm" placeholder="Ex: OS-2025-08-A">
+            </div>
+            <div>
+                <label for="responsavel" class="block text-base font-bold text-gray-800">Responsável</label>
+                <select id="responsavel" name="responsavel" required class="mt-2 block w-full p-3 border border-gray-300 rounded-lg shadow-sm bg-white">
+                    <option value="">Selecione um nome...</option>
+                    <option>Amanda Alexandre</option>
+                    <option>Lorena Bossolan</option>
+                    <option>Leonardo Fruet</option>
+                    <option>Yasmin</option>
+                    <option>Rafael</option>
+                </select>
+            </div>
+        </div>
+
+        <main class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <div class="flex flex-col gap-4">
+                <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
+                    <h2 class="text-2xl font-bold text-gray-900">Estoque Disponível</h2>
+                    <div class="flex items-center gap-2">
+                         <label for="filtro-bitola" class="text-sm font-medium">Filtrar:</label>
+                         <select id="filtro-bitola" class="p-2 border border-gray-300 rounded-lg shadow-sm text-sm"></select>
+                    </div>
+                </div>
+                <div id="lista-estoque" class="flex flex-col gap-4 max-h-[60vh] overflow-y-auto pr-3"></div>
+                <div id="estoque-vazio-msg" class="hidden text-center p-10 card">
+                    <h3 class="mt-2 text-lg font-semibold text-gray-800">Estoque Vazio</h3>
+               </div>
+            </div>
+
+            <div class="flex flex-col gap-4">
+                <h2 class="text-2xl font-bold text-gray-900">Seu Pedido</h2>
+                <button id="add-manual-btn" class="w-full btn-primary justify-center font-bold py-3 px-4 rounded-lg transition-transform hover:scale-105">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" /></svg>
+                    Buscar Peça Manualmente
+                </button>
+                <div class="card p-4 flex-grow">
+                    <div id="lista-pedido" class="flex flex-col gap-3 max-h-[50vh] overflow-y-auto pr-2"></div>
+                    <div id="pedido-vazio-msg" class="text-center p-10 h-full flex flex-col justify-center items-center">
+                        <svg class="h-16 w-16 text-gray-300" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 9.776c.112-.017.227-.026.344-.026h15.812c.117 0 .232.009.344.026m-16.5 0a2.25 2.25 0 00-1.883 2.542l.857 6a2.25 2.25 0 002.227 1.932H19.05a2.25 2.25 0 002.227-1.932l.857-6a2.25 2.25 0 00-1.883-2.542m-16.5 0V6A2.25 2.25 0 016 3.75h12A2.25 2.25 0 0120.25 6v3.776" /></svg>
+                        <h3 class="mt-4 text-lg font-semibold text-gray-800">Seu pedido está vazio</h3>
+                        <p class="mt-1 text-sm text-gray-500">Adicione peças do estoque ou busque uma.</p>
+                    </div>
+                </div>
+                <div class="mt-auto">
+                     <button id="gerar-relatorio-btn" class="w-full btn-success justify-center font-bold py-3 px-4 rounded-lg transition-transform hover:scale-105 text-lg">
+                         Finalizar e Gerar Relatório
+                     </button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div id="manual-add-modal" class="modal fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50 p-4">
+        <div class="card p-6 w-full max-w-lg form-modal-content">
+            <h3 class="text-2xl font-bold text-gray-900 mb-4">Buscar Peça Manualmente</h3>
+            <form id="peca-form" class="space-y-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Tipo</label>
+                        <select name="tipo-peca" class="mt-1 block w-full p-2 border border-gray-300 rounded-md">
+                            <option value="barra">Barra</option><option value="estribo">Estribo</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Bitola</label>
+                        <select name="bitola-aco" class="mt-1 block w-full p-2 border border-gray-300 rounded-md">
+                            <option value="4.2">4.2 mm</option><option value="5.0">5.0 mm</option><option value="6.3">6.3 mm (1/4")</option><option value="8.0">8.0 mm (5/16")</option><option value="10.0">10.0 mm (3/8")</option><option value="12.5">12.5 mm (1/2")</option><option value="16.0">16.0 mm (5/8")</option>
+                        </select>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Quantidade</label>
+                    <input type="number" name="quantidade" min="1" required class="mt-1 block w-full p-2 border border-gray-300 rounded-md">
+                </div>
+                <div id="dimensoes-barra-modal" style="display:none;" class="border-t pt-4">
+                    <label class="block text-sm font-medium">Comprimento (cm)</label>
+                    <input type="number" name="comprimento-barra" min="0" step="0.1" class="mt-1 block w-full p-2 border border-gray-300 rounded-md">
+                </div>
+                <div id="dimensoes-estribo-modal" style="display:none;" class="border-t pt-4 space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium">Formato</label>
+                        <select name="formato-estribo" class="mt-1 block w-full p-2 border border-gray-300 rounded-md">
+                            <option value="retangular">Retangular</option><option value="redondo">Redondo</option><option value="triangular">Triangular</option>
+                        </select>
+                    </div>
+                    <div id="estribo-retangular-dims-modal" style="display:none;" class="grid grid-cols-2 gap-4">
+                        <div><label class="block text-sm font-medium">Altura (cm)</label><input type="number" name="estribo-altura" min="0" step="0.1" class="mt-1 block w-full p-2 border"></div>
+                        <div><label class="block text-sm font-medium">Largura (cm)</label><input type="number" name="estribo-largura" min="0" step="0.1" class="mt-1 block w-full p-2 border"></div>
+                    </div>
+                    <div id="estribo-redondo-dims-modal" style="display:none;"><label class="block text-sm font-medium">Diâmetro (cm)</label><input type="number" name="estribo-diametro" min="0" step="0.1" class="mt-1 block w-full p-2 border"></div>
+                </div>
+            </form>
+            <div class="mt-6 flex justify-end gap-3">
+                <button id="modal-cancel-btn" type="button" class="px-5 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 font-semibold">Cancelar</button>
+                <button id="modal-find-btn" type="button" class="px-5 py-2 btn-primary rounded-lg font-semibold">Buscar</button>
+            </div>
+        </div>
+    </div>
+    
+    <div id="suggestions-modal" class="modal fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50 p-4">
+        <div class="card p-6 w-full max-w-2xl">
+            <h3 class="text-xl font-bold text-gray-900 mb-2">Sugestões de Reaproveitamento</h3>
+            <p class="text-sm text-gray-600 mb-4">Encontramos estas peças compatíveis no estoque. Deseja usar alguma delas?</p>
+            <div id="suggestions-list" class="space-y-3 max-h-64 overflow-y-auto pr-2"></div>
+            <div class="mt-6 flex justify-end">
+                <button id="suggestions-cancel-btn" class="px-5 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 font-semibold">Fechar</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="quantity-modal" class="modal fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50 p-4">
+        <div class="card p-6 w-full max-w-sm">
+            <h3 class="text-lg font-semibold text-gray-900 mb-4" id="quantity-modal-title"></h3>
+            <input type="number" id="quantity-input" min="1" class="w-full p-3 border border-gray-300 rounded-lg">
+            <div class="mt-4 flex justify-end gap-3">
+                <button id="quantity-cancel-btn" class="px-5 py-2 bg-gray-200 rounded-lg font-semibold">Cancelar</button>
+                <button id="quantity-confirm-btn" class="px-5 py-2 btn-primary rounded-lg font-semibold">Confirmar</button>
+            </div>
+        </div>
+    </div>
+    
+    <div id="ranking-modal" class="modal fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50 p-4">
+        <div class="card p-6 w-full max-w-md">
+            <h3 class="text-2xl font-bold text-gray-900 mb-4">🏆 Ranking de Reaproveitamento</h3>
+            <div class="flex justify-between items-center mb-4">
+                <button id="prev-month-btn" class="p-2 rounded-full hover:bg-gray-200">◀</button>
+                <h4 id="ranking-month-year" class="text-lg font-semibold"></h4>
+                <button id="next-month-btn" class="p-2 rounded-full hover:bg-gray-200">▶</button>
+            </div>
+            <div id="ranking-list" class="space-y-2"></div>
+            <div class="mt-6 flex justify-end">
+                <button id="ranking-close-btn" class="px-5 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 font-semibold">Fechar</button>
+            </div>
+        </div>
+    </div>
+    
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js";
+        import { getFirestore, collection, onSnapshot, doc, writeBatch, addDoc, serverTimestamp, getDocs, query, where, Timestamp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCoGyh8PPO6ETGnFKxoBAmkGFyxg0zvF9M",
+            authDomain: "reaproveitamento-60340.firebaseapp.com",
+            projectId: "reaproveitamento-60340",
+            storageBucket: "reaproveitamento-60340.appspot.com",
+            messagingSenderId: "757905842680",
+            appId: "1:757905842680:web:f744ade5197e5f054d760d"
+        };
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const pecasCollection = collection(db, 'pecas');
+        const historicoCollection = collection(db, 'historico_reaproveitamento');
+
+        const dobraFinalCm = { '4.2': 10, '5.0': 10, '6.3': 12, '8.0': 14, '10.0': 16, '12.5': 20, '16.0': 24 };
+        const pesoPorMetroKg = { '4.2': 0.110, '5.0': 0.154, '6.3': 0.245, '8.0': 0.395, '10.0': 0.617, '12.5': 0.963, '16.0': 1.578 };
+
+        let estoque = [];
+        let pedido = [];
+        let filtroBitolaAtual = 'todas';
+        let pecaManualTemporaria = null;
+        let currentRankingDate = new Date();
+
+        const listaEstoqueContainer = document.getElementById('lista-estoque');
+        const listaPedidoContainer = document.getElementById('lista-pedido');
+        const filtroBitolaSelect = document.getElementById('filtro-bitola');
+        const estoqueVazioMsg = document.getElementById('estoque-vazio-msg');
+        const pedidoVazioMsg = document.getElementById('pedido-vazio-msg');
+        const manualAddModal = document.getElementById('manual-add-modal');
+        const suggestionsModal = document.getElementById('suggestions-modal');
+        const rankingModal = document.getElementById('ranking-modal');
+        const pecaForm = document.getElementById('peca-form');
+        
+        const formatarDimensoes = (peca) => {
+            if (peca.tipo === 'barra') return `Comp: ${peca.comprimento?.toFixed(1)} cm`;
+            if (peca.formato === 'retangular') return `${peca.altura?.toFixed(1)} x ${peca.largura?.toFixed(1)} cm`;
+            if (peca.formato === 'redondo') return `Ø ${peca.diametro?.toFixed(1)} cm`;
+            if (peca.formato === 'triangular') return `B: ${peca.base?.toFixed(1)} L: ${peca.lado?.toFixed(1)} cm`;
+            return '-';
+        };
+
+        const calcularMedidas = (peca) => {
+            let lengthPerUnitCm = 0;
+            if (peca.tipo === 'barra') {
+                lengthPerUnitCm = peca.comprimento || 0;
+            } else {
+                let perimetro = 0;
+                if (peca.formato === 'retangular') perimetro = 2 * ((peca.altura || 0) + (peca.largura || 0));
+                else if (peca.formato === 'redondo') perimetro = Math.PI * (peca.diametro || 0);
+                else if (peca.formato === 'triangular') perimetro = (peca.base || 0) + ((peca.lado || 0) * 2);
+                lengthPerUnitCm = perimetro + (dobraFinalCm[peca.bitola] || 0);
+            }
+            const pesoBaseKgM = pesoPorMetroKg[peca.bitola] || 0;
+            const totalWeightKg = (lengthPerUnitCm / 100) * pesoBaseKgM;
+            return { lengthPerUnitCm, totalWeightKg };
+        };
+
+        const gerarDesenhoSvg = (peca, containerClasses = '', viewBoxSize = 100) => {
+             if (!peca) return '';
+            let svgShape = '', svgDimensions = '';
+            const padding = 15;
+            const size = viewBoxSize - 2 * padding;
+            if (peca.tipo === 'barra') {
+                svgShape = `<line x1="${padding}" y1="${viewBoxSize/2}" x2="${viewBoxSize - padding}" y2="${viewBoxSize/2}" stroke="#4B5563" stroke-width="2.5" stroke-linecap="round"/>`;
+                svgDimensions = `<text class="blueprint-text" x="${viewBoxSize/2}" y="${viewBoxSize/2 + 18}" text-anchor="middle">${peca.comprimento||0}cm</text>`;
+            } else if (peca.formato) {
+                if (peca.formato === 'retangular') {
+                    const w = peca.largura || 1; const h = peca.altura || 1; const scale = size / Math.max(w, h);
+                    const sw = w * scale; const sh = h * scale; const x = (viewBoxSize - sw) / 2; const y = (viewBoxSize - sh) / 2;
+                    svgShape = `<rect x="${x}" y="${y}" width="${sw}" height="${sh}" stroke="#4B5563" stroke-width="2.5" fill="none" rx="2"/>`;
+                    svgDimensions = `<text class="blueprint-text" x="${x - 10}" y="${y + sh/2}" writing-mode="vertical-rl" text-anchor="middle" dominant-baseline="middle">${h}cm</text><text class="blueprint-text" x="${x + sw/2}" y="${y + sh + 12}" text-anchor="middle">${w}cm</text>`;
+                } else if (peca.formato === 'redondo') {
+                    const r = size / 2;
+                    svgShape = `<circle cx="${viewBoxSize/2}" cy="${viewBoxSize/2}" r="${r}" stroke="#4B5563" stroke-width="2.5" fill="none"/>`;
+                    svgDimensions = `<line class="blueprint-line" x1="${padding}" y1="${viewBoxSize/2}" x2="${viewBoxSize - padding}" y2="${viewBoxSize/2}" /><text class="blueprint-text" x="${viewBoxSize/2}" y="${viewBoxSize/2 - 8}" text-anchor="middle">${peca.diametro||0}cm</text>`;
+                }
+            }
+            return `<div class="${containerClasses}"><svg viewBox="0 0 ${viewBoxSize} ${viewBoxSize}" class="w-full h-full">${svgShape}${svgDimensions}</svg></div>`;
+        };
+
+        // ==========================================================
+        // INÍCIO DA ALTERAÇÃO: EXIBIÇÃO DA OBSERVAÇÃO
+        // ==========================================================
+        const renderizarEstoque = () => {
+            listaEstoqueContainer.innerHTML = '';
+            const estoqueFiltrado = filtroBitolaAtual === 'todas' ? estoque : estoque.filter(p => p.bitola === filtroBitolaAtual);
+            estoqueVazioMsg.classList.toggle('hidden', estoqueFiltrado.length > 0);
+            estoqueFiltrado.forEach(peca => {
+                if (peca.quantidade > 0) {
+                    const card = document.createElement('div');
+                    card.className = 'card p-3';
+                    card.innerHTML = `
+                        <div class="flex items-start gap-4">
+                            ${gerarDesenhoSvg(peca, 'w-20 h-20 flex-shrink-0 bg-gray-50 rounded-md p-1')}
+                            <div class="flex-1">
+                                <p class="font-bold text-gray-800 capitalize">${peca.tipo} ${peca.formato || ''} - ${peca.bitola}mm</p>
+                                <p class="text-sm text-gray-600">${formatarDimensoes(peca)}</p>
+                                <p class="text-sm">Disponível: <span class="font-bold text-blue-600 text-base">${peca.quantidade}</span> Unid.</p>
+                                ${peca.observacao ? `<p class="text-xs text-amber-700 italic mt-1">Obs: ${peca.observacao}</p>` : ''}
+                            </div>
+                            <button data-id="${peca.id}" class="utilizar-btn btn-primary rounded-full h-12 w-12 flex items-center justify-center flex-shrink-0 transition-transform hover:scale-110">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M12 4v16m8-8H4" /></svg>
+                            </button>
+                        </div>`;
+                    listaEstoqueContainer.appendChild(card);
+                }
+            });
+        };
+        // ==========================================================
+        // FIM DA ALTERAÇÃO
+        // ==========================================================
+        
+        const renderizarPedido = () => {
+            listaPedidoContainer.innerHTML = '';
+            pedidoVazioMsg.classList.toggle('hidden', pedido.length > 0);
+            pedido.forEach((item, index) => {
+                const card = document.createElement('div');
+                card.className = 'border-b border-gray-200 pb-3';
+                card.innerHTML = `
+                    <div class="flex items-start gap-3">
+                        ${gerarDesenhoSvg(item.peca, 'w-16 h-16 flex-shrink-0 bg-gray-50 rounded-md p-1')}
+                        <div class="flex-1">
+                            <p class="font-semibold capitalize">${item.peca.tipo} ${item.peca.formato || ''} - ${item.peca.bitola}mm</p>
+                            <p class="text-sm text-gray-500">${formatarDimensoes(item.peca)}</p>
+                            ${item.peca.observacao ? `<p class="text-xs text-amber-700 italic mt-1">Obs: ${item.peca.observacao}</p>` : ''}
+                            <p class="text-sm mt-2">Quantidade: <span class="font-bold text-lg">${item.qtdRequisitada}</span></p>
+                        </div>
+                        <button data-index="${index}" class="remover-pedido-btn text-gray-400 hover:text-red-500 p-1">
+                           <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" /></svg>
+                        </button>
+                    </div>`;
+                listaPedidoContainer.appendChild(card);
+            });
+        };
+        
+        const atualizarTudo = () => {
+            const bitolasDisponiveis = [...new Set(estoque.map(p => p.bitola))].sort((a,b) => parseFloat(a) - parseFloat(b));
+            filtroBitolaSelect.innerHTML = '<option value="todas">Todas as Bitolas</option>';
+            bitolasDisponiveis.forEach(bitola => {
+                filtroBitolaSelect.innerHTML += `<option value="${bitola}">${bitola} mm</option>`;
+            });
+            filtroBitolaSelect.value = filtroBitolaAtual;
+            renderizarEstoque();
+            renderizarPedido();
+        };
+
+        const adicionarItemAoPedido = (item) => {
+            pedido.push(item);
+            atualizarTudo();
+        };
+
+        const removerItemDoPedido = (index) => {
+            pedido.splice(index, 1);
+            atualizarTudo();
+        };
+
+        // ==========================================================
+        // INÍCIO DA ALTERAÇÃO: LÓGICA DE SUGESTÃO MELHORADA
+        // ==========================================================
+        const buscarSugestoes = (pecaReq) => {
+            const { lengthPerUnitCm: compReq } = calcularMedidas(pecaReq);
+            // Define uma margem de tolerância superior (ex: 20% maior que o solicitado)
+            const margemSuperior = compReq * 1.20; 
+
+            return estoque.filter(p => {
+                // A peça deve ser do mesmo tipo e bitola, e ter quantidade
+                if (p.tipo !== pecaReq.tipo || p.bitola !== pecaReq.bitola || p.quantidade <= 0) {
+                    return false;
+                }
+                
+                const { lengthPerUnitCm: compEstoque } = calcularMedidas(p);
+
+                // A peça em estoque deve ser:
+                // 1. Maior ou igual ao comprimento requisitado.
+                // 2. Menor ou igual à nossa margem de tolerância superior.
+                return compEstoque >= compReq && compEstoque <= margemSuperior;
+            
+            }).sort((a, b) => {
+                // Ordena pela menor diferença, mostrando a peça mais próxima primeiro.
+                const diffA = calcularMedidas(a).lengthPerUnitCm - compReq;
+                const diffB = calcularMedidas(b).lengthPerUnitCm - compReq;
+                return diffA - diffB;
+            });
+        };
+        // ==========================================================
+        // FIM DA ALTERAÇÃO
+        // ==========================================================
+
+        filtroBitolaSelect.addEventListener('change', (e) => {
+            filtroBitolaAtual = e.target.value;
+            renderizarEstoque();
+        });
+
+        listaEstoqueContainer.addEventListener('click', (e) => {
+            const utilizarBtn = e.target.closest('.utilizar-btn');
+            if (utilizarBtn) {
+                const pecaId = utilizarBtn.dataset.id;
+                const peca = estoque.find(p => p.id === pecaId);
+                const quantityModal = document.getElementById('quantity-modal');
+                const quantityInput = document.getElementById('quantity-input');
+                document.getElementById('quantity-modal-title').textContent = `Usar ${peca.tipo} ${peca.bitola}mm?`;
+                quantityInput.max = peca.quantidade;
+                quantityInput.value = '';
+                quantityInput.placeholder = `Máx: ${peca.quantidade}`;
+                quantityModal.classList.remove('hidden');
+
+                const confirmHandler = () => {
+                    const qtd = parseInt(quantityInput.value, 10);
+                    if (qtd > 0 && qtd <= peca.quantidade) {
+                        adicionarItemAoPedido({ peca, qtdRequisitada: qtd, sourceId: peca.id });
+                    } else {
+                        alert(`Quantidade inválida. Insira um valor entre 1 e ${peca.quantidade}.`);
+                    }
+                    closeModal();
+                };
+                const closeModal = () => {
+                    quantityModal.classList.add('hidden');
+                    document.getElementById('quantity-confirm-btn').removeEventListener('click', confirmHandler);
+                };
+                document.getElementById('quantity-confirm-btn').addEventListener('click', confirmHandler, { once: true });
+                document.getElementById('quantity-cancel-btn').addEventListener('click', closeModal, { once: true });
+            }
+        });
+        
+        listaPedidoContainer.addEventListener('click', (e) => {
+            const removerBtn = e.target.closest('.remover-pedido-btn');
+            if (removerBtn) removerItemDoPedido(removerBtn.dataset.index);
+        });
+
+        const toggleCamposDinamicosModal = () => {
+            const tipoPeca = pecaForm.querySelector('[name="tipo-peca"]').value;
+            const formatoEstribo = pecaForm.querySelector('[name="formato-estribo"]').value;
+            pecaForm.querySelector('#dimensoes-barra-modal').style.display = tipoPeca === 'barra' ? 'block' : 'none';
+            pecaForm.querySelector('#dimensoes-estribo-modal').style.display = tipoPeca === 'estribo' ? 'block' : 'none';
+            if(tipoPeca === 'estribo') {
+                pecaForm.querySelector('#estribo-retangular-dims-modal').style.display = formatoEstribo === 'retangular' ? 'grid' : 'none';
+                pecaForm.querySelector('#estribo-redondo-dims-modal').style.display = formatoEstribo === 'redondo' ? 'block' : 'none';
+            }
+        };
+
+        document.getElementById('add-manual-btn').addEventListener('click', () => {
+            pecaForm.reset();
+            toggleCamposDinamicosModal();
+            manualAddModal.classList.remove('hidden');
+        });
+        document.getElementById('modal-cancel-btn').addEventListener('click', () => manualAddModal.classList.add('hidden'));
+
+        pecaForm.addEventListener('change', (e) => {
+            if (e.target.matches('[name="tipo-peca"], [name="formato-estribo"]')) {
+                toggleCamposDinamicosModal();
+            }
+        });
+
+        document.getElementById('modal-find-btn').addEventListener('click', () => {
+            const formData = new FormData(pecaForm);
+            const quantidade = parseInt(formData.get('quantidade'), 10);
+            if (!quantidade || quantidade <= 0) return alert('Por favor, insira uma quantidade válida.');
+            const pecaReq = { tipo: formData.get('tipo-peca'), bitola: formData.get('bitola-aco') };
+            if (pecaReq.tipo === 'barra') {
+                pecaReq.comprimento = parseFloat(formData.get('comprimento-barra'));
+            } else {
+                pecaReq.formato = formData.get('formato-estribo');
+                pecaReq.altura = parseFloat(formData.get('estribo-altura'));
+                pecaReq.largura = parseFloat(formData.get('estribo-largura'));
+            }
+            pecaManualTemporaria = { peca: pecaReq, qtdRequisitada: quantidade };
+            const sugestoes = buscarSugestoes(pecaReq);
+            manualAddModal.classList.add('hidden');
+            if (sugestoes.length > 0) {
+                const suggestionsList = document.getElementById('suggestions-list');
+                // Adicionada a exibição da observação na lista de sugestões
+                suggestionsList.innerHTML = sugestoes.map(s => `
+                    <div class="card p-3 flex items-start justify-between gap-3">
+                        ${gerarDesenhoSvg(s, 'w-16 h-16 flex-shrink-0 bg-gray-50 rounded-md p-1')}
+                        <div class="flex-1">
+                            <p class="font-semibold capitalize">${s.tipo} ${s.formato || ''} - ${s.bitola}mm</p>
+                            <p class="text-sm">Dimensões: ${formatarDimensoes(s)}</p>
+                            <p class="text-sm">Disponível: ${s.quantidade}</p>
+                            ${s.observacao ? `<p class="text-xs text-amber-700 italic mt-1">Obs: ${s.observacao}</p>` : ''}
+                        </div>
+                        <button data-id="${s.id}" class="usar-sugestao-btn btn-success px-4 py-2 rounded-lg font-semibold flex-shrink-0">Usar</button>
+                    </div>`).join('');
+                suggestionsModal.classList.remove('hidden');
+            } else {
+                alert('Nenhuma peça com dimensões próximas foi encontrada no estoque.');
+            }
+        });
+        
+        document.getElementById('suggestions-list').addEventListener('click', (e) => {
+            const usarBtn = e.target.closest('.usar-sugestao-btn');
+            if (usarBtn) {
+                const pecaId = usarBtn.dataset.id;
+                const pecaSugerida = estoque.find(p => p.id === pecaId);
+                const qtd = pecaManualTemporaria.qtdRequisitada;
+                if (qtd > pecaSugerida.quantidade) return alert(`Quantidade insuficiente. Disponível: ${pecaSugerida.quantidade}`);
+                adicionarItemAoPedido({ peca: pecaSugerida, qtdRequisitada: qtd, sourceId: pecaId });
+                suggestionsModal.classList.add('hidden');
+            }
+        });
+
+        document.getElementById('suggestions-cancel-btn').addEventListener('click', () => suggestionsModal.classList.add('hidden'));
+
+        const showRanking = async () => {
+            const year = currentRankingDate.getFullYear();
+            const month = currentRankingDate.getMonth();
+            document.getElementById('ranking-month-year').textContent = `${currentRankingDate.toLocaleString('pt-BR', { month: 'long' })} ${year}`;
+            const startOfMonth = new Date(year, month, 1);
+            const endOfMonth = new Date(year, month + 1, 0, 23, 59, 59);
+            const q = query(historicoCollection, where('data', '>=', Timestamp.fromDate(startOfMonth)), where('data', '<=', Timestamp.fromDate(endOfMonth)));
+            const querySnapshot = await getDocs(q);
+            const rankingData = {};
+            querySnapshot.forEach(doc => {
+                const data = doc.data();
+                rankingData[data.responsavel] = (rankingData[data.responsavel] || 0) + data.peso;
+            });
+            const sortedRanking = Object.entries(rankingData).sort((a, b) => b[1] - a[1]);
+            const rankingList = document.getElementById('ranking-list');
+            rankingList.innerHTML = sortedRanking.map(([nome, peso], index) => {
+                const medalhas = ['🥇', '🥈', '🥉'];
+                return `<div class="flex items-center justify-between p-2 rounded-lg ${index < 3 ? 'bg-amber-100' : ''}">
+                        <span class="font-semibold">${medalhas[index] || `#${index + 1}`} ${nome}</span>
+                        <span class="font-bold text-gray-700">${peso.toFixed(2)} kg</span>
+                    </div>`;
+            }).join('') || '<p class="text-center text-gray-500">Nenhum dado para este mês.</p>';
+        };
+
+        document.getElementById('ranking-btn').addEventListener('click', () => {
+            currentRankingDate = new Date();
+            showRanking();
+            rankingModal.classList.remove('hidden');
+        });
+        document.getElementById('ranking-close-btn').addEventListener('click', () => rankingModal.classList.add('hidden'));
+        document.getElementById('prev-month-btn').addEventListener('click', () => {
+            currentRankingDate.setMonth(currentRankingDate.getMonth() - 1);
+            showRanking();
+        });
+        document.getElementById('next-month-btn').addEventListener('click', () => {
+            currentRankingDate.setMonth(currentRankingDate.getMonth() + 1);
+            showRanking();
+        });
+
+        document.getElementById('gerar-relatorio-btn').addEventListener('click', async () => {
+            const numeroPedido = document.getElementById('numero-pedido').value.trim();
+            const responsavel = document.getElementById('responsavel').value;
+            if (!numeroPedido || !responsavel) {
+                return alert("ERRO: Preencha o Número do Pedido e o Responsável.");
+            }
+            if (pedido.length === 0) return alert("Seu pedido está vazio.");
+
+            try {
+                const requisicaoPorId = {};
+                pedido.forEach(item => {
+                    if (item.sourceId) {
+                        requisicaoPorId[item.sourceId] = (requisicaoPorId[item.sourceId] || 0) + item.qtdRequisitada;
+                    }
+                });
+
+                for (const id in requisicaoPorId) {
+                    const pecaEmEstoque = estoque.find(p => p.id === id);
+                    if (!pecaEmEstoque || requisicaoPorId[id] > pecaEmEstoque.quantidade) {
+                        alert(`ERRO: A quantidade para a peça ${pecaEmEstoque ? formatarDimensoes(pecaEmEstoque) : id} excede o estoque disponível (${pecaEmEstoque ? pecaEmEstoque.quantidade : 0}).`);
+                        return;
+                    }
+                }
+                
+                let pesoTotalReaproveitado = 0;
+                pedido.forEach(item => {
+                    const { totalWeightKg } = calcularMedidas(item.peca);
+                    pesoTotalReaproveitado += totalWeightKg * item.qtdRequisitada;
+                });
+                
+                const batch = writeBatch(db);
+                for (const id in requisicaoPorId) {
+                    const pecaRef = doc(db, 'pecas', id);
+                    const pecaOriginal = estoque.find(p => p.id === id);
+                    const novaQuantidade = pecaOriginal.quantidade - requisicaoPorId[id];
+                    batch.update(pecaRef, { quantidade: novaQuantidade });
+                }
+
+                await addDoc(historicoCollection, {
+                    responsavel,
+                    peso: pesoTotalReaproveitado,
+                    data: serverTimestamp()
+                });
+                
+                await batch.commit();
+
+                gerarRelatorio(numeroPedido, responsavel, pesoTotalReaproveitado);
+                pedido = []; 
+                document.getElementById('numero-pedido').value = '';
+                document.getElementById('responsavel').value = '';
+                atualizarTudo();
+
+            } catch (error) {
+                console.error("Erro ao finalizar pedido: ", error);
+                alert("Ocorreu um erro ao salvar os dados. A operação foi cancelada para garantir a integridade do estoque.");
+            }
+        });
+        
+        const gerarRelatorio = (numeroPedido, responsavel, pesoTotalReaproveitado) => {
+            const dataRelatorio = new Date().toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' });
+            const tabelaPedidoHtml = pedido.map(item => `
+                <tr class="border-b border-gray-200">
+                    <td class="p-3 align-middle text-center font-bold">${item.qtdRequisitada}</td>
+                    <td class="p-3 align-middle capitalize">${item.peca.tipo} ${item.peca.formato || ''}</td>
+                    <td class="p-3 align-middle text-center">${item.peca.bitola}mm</td>
+                    <td class="p-3 align-middle">${formatarDimensoes(item.peca)}</td>
+                    <td class="p-3 align-middle">${gerarDesenhoSvg(item.peca, 'w-24 h-20 mx-auto')}</td>
+                </tr>`).join('');
+
+            const relatorioHtml = `
+                <div class="p-8 bg-white">
+                    <header class="text-center mb-10">
+                        <h1 class="text-3xl font-extrabold text-gray-900">Relatório de Reaproveitamento</h1>
+                        <p class="text-lg text-gray-700 mt-2"><strong>Pedido/OS:</strong> ${numeroPedido}</p>
+                        <p class="text-sm text-gray-500">Gerado por: ${responsavel} em ${dataRelatorio}</p>
+                    </header>
+                    <section class="mb-10 text-center">
+                        <h2 class="text-lg font-semibold text-gray-600 uppercase tracking-wider">Peso Total Reaproveitado</h2>
+                        <p class="font-extrabold text-green-600 text-5xl mt-2">${pesoTotalReaproveitado.toFixed(2)} kg</p>
+                    </section>
+                    <section>
+                        <h2 class="text-xl font-bold text-gray-800 mb-4 border-b-2 border-gray-200 pb-2">Lista de Peças a Separar do Estoque</h2>
+                        <table class="w-full text-base">
+                            <thead class="bg-gray-100"><tr class="text-left text-sm uppercase text-gray-600">
+                                <th class="p-3 text-center">Qtd.</th><th class="p-3">Tipo</th><th class="p-3 text-center">Bitola</th><th class="p-3">Dimensões</th><th class="p-3 text-center">Desenho</th>
+                            </tr></thead>
+                            <tbody>${tabelaPedidoHtml}</tbody>
+                        </table>
+                    </section>
+                </div>`;
+            
+            let rc = document.getElementById('relatorio-container');
+            if (rc) rc.remove();
+            rc = document.createElement('div');
+            rc.id = 'relatorio-container';
+            rc.innerHTML = relatorioHtml;
+            document.body.appendChild(rc);
+            window.print();
+        };
+
+        onSnapshot(pecasCollection, (snapshot) => {
+            estoque = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            atualizarTudo();
+        });
+
+    </script>
+</body>
+</html>
