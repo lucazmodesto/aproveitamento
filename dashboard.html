@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard de Sobras - Reaproveita</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #F3F4F6; }
+        .card { 
+            background-color: white; 
+            border-radius: 0.75rem; 
+            box-shadow: 0 1px 3px 0 rgba(0,0,0,0.05), 0 1px 2px -1px rgba(0,0,0,0.05);
+            border: 1px solid #E5E7EB;
+        }
+        .kpi-card { transition: all 0.2s ease-in-out; }
+        .kpi-card:hover { transform: translateY(-4px); box-shadow: 0 4px 10px 0 rgba(0,0,0,0.07); }
+        .modal { transition: opacity 0.3s ease; }
+    </style>
+</head>
+<body class="text-gray-800">
+
+    <div class="container mx-auto p-4 sm:p-6 lg:p-8">
+        <header class="mb-8 pb-4 border-b border-gray-200 flex flex-col sm:flex-row justify-between sm:items-center gap-4">
+            <div>
+                 <h1 class="text-3xl sm:text-4xl font-extrabold text-gray-900">
+                    Dashboard de Sobras
+                </h1>
+                <p class="text-gray-500 mt-1">Análise da geração de sobras de material.</p>
+            </div>
+            <a href="cadastro.html" class="inline-flex items-center justify-center px-5 py-2.5 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors">
+                Ir para o Estoque
+            </a>
+        </header>
+
+        <main class="space-y-8">
+            <div class="card p-4">
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                    <h3 class="text-lg font-semibold text-gray-700">Período de Análise</h3>
+                    <div class="flex flex-wrap items-center gap-4">
+                        <div>
+                            <label for="filtro-mes" class="text-sm font-medium text-gray-600">Mês:</label>
+                            <select id="filtro-mes" class="mt-1 p-2 border border-gray-300 rounded-lg shadow-sm text-sm focus:ring-blue-500 focus:border-blue-500"></select>
+                        </div>
+                         <div>
+                            <label for="filtro-ano" class="text-sm font-medium text-gray-600">Ano:</label>
+                            <select id="filtro-ano" class="mt-1 p-2 border border-gray-300 rounded-lg shadow-sm text-sm focus:ring-blue-500 focus:border-blue-500"></select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="empty-state" class="hidden text-center py-16 card">
+                <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"><path vector-effect="non-scaling-stroke" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z" /></svg>
+                <h3 class="mt-2 text-lg font-semibold text-gray-900">Nenhum dado encontrado</h3>
+                <p class="mt-1 text-sm text-gray-500">Não há registros de sobras para o período selecionado.</p>
+            </div>
+
+            <div id="dashboard-content" class="space-y-8">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div class="card kpi-card p-5 flex items-start gap-4 lg:col-span-1">
+                        <div class="flex-shrink-0 bg-blue-100 text-blue-600 rounded-lg p-3"><svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M21 7.5l-9-5.25L3 7.5m18 0l-9 5.25m9-5.25v9l-9 5.25M3 7.5l9 5.25M3 7.5v9l9 5.25m0-9v9" /></svg></div>
+                        <div><p class="text-sm font-medium text-gray-500">Peso Total de Sobras</p><p id="kpi-total-peso" class="text-2xl font-bold text-gray-900 mt-1">0,00 kg</p></div>
+                    </div>
+                    <div class="card kpi-card p-5 flex items-start gap-4 lg:col-span-1">
+                        <div class="flex-shrink-0 bg-green-100 text-green-600 rounded-lg p-3"><svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 4.5v15m6-15v15m-10.875 0h15.75c.621 0 1.125-.504 1.125-1.125V5.625c0-.621-.504-1.125-1.125-1.125H4.125c-.621 0-1.125.504-1.125 1.125v12.75c0 .621.504 1.125 1.125 1.125z" /></svg></div>
+                        <div><p class="text-sm font-medium text-gray-500">Total de Peças</p><p id="kpi-total-pecas" class="text-2xl font-bold text-gray-900 mt-1">0</p></div>
+                    </div>
+                     <div class="card kpi-card p-5 flex items-start gap-4 lg:col-span-1">
+                        <div class="flex-shrink-0 bg-violet-100 text-violet-600 rounded-lg p-3"><svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M11.42 15.17L17.25 21A2.652 2.652 0 0021 17.25l-5.877-5.877M11.42 15.17l2.472-2.472a3.375 3.375 0 00-4.773-4.773L6.75 15.17l-2.472 2.472a3.375 3.375 0 004.773 4.773l2.472-2.472z" /></svg></div>
+                        <div><p class="text-sm font-medium text-gray-500">Máquina (Top Sobras)</p><p id="kpi-top-maquina" class="text-2xl font-bold text-gray-900 mt-1">-</p></div>
+                    </div>
+                    <div class="card kpi-card p-5 flex items-start gap-4">
+                         <div class="flex-shrink-0 bg-amber-100 text-amber-600 rounded-lg p-3"><svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" /></svg></div>
+                        <div><p class="text-sm font-medium text-gray-500">Operador (Top Sobras)</p><p id="kpi-top-operador" class="text-2xl font-bold text-gray-900 mt-1">-</p></div>
+                    </div>
+                     <div class="card kpi-card p-5 flex items-start gap-4">
+                        <div class="flex-shrink-0 bg-red-100 text-red-600 rounded-lg p-3"><svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 21h16.5M4.5 3h15M5.25 3v18m13.5-18v18M9 6.75h6.375M9 12h6.375m-6.375 5.25h6.375M5.25 9h13.5" /></svg></div>
+                        <div><p class="text-sm font-medium text-gray-500">Setor (Top Sobras)</p><p id="kpi-top-setor" class="text-2xl font-bold text-gray-900 mt-1">-</p></div>
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+                    <div class="card p-6 lg:col-span-2">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-xl font-bold text-gray-800">Geração de Sobras por Operador (kg)</h3>
+                            <button id="btn-ver-todos-operadores" class="text-sm font-semibold text-blue-600 hover:text-blue-800">Ver Todos</button>
+                        </div>
+                        <div class="relative h-96">
+                            <canvas id="chart-operadores"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="card p-6 lg:col-span-1 space-y-4">
+                        <h3 class="text-xl font-bold text-gray-800 mb-2">Resumo de Pesos</h3>
+                         <div class="overflow-x-auto">
+                            <table class="w-full text-sm text-left">
+                                <thead class="bg-gray-50 text-xs text-gray-700 uppercase">
+                                    <tr><th scope="col" class="px-4 py-2">Bitola</th><th scope="col" class="px-4 py-2 text-right">Peso (kg)</th></tr>
+                                </thead>
+                                <tbody id="resumo-tbody"></tbody>
+                                <tfoot class="font-bold border-t-2 border-gray-300">
+                                    <tr id="resumo-tfoot"><td class="px-4 py-2">TOTAL</td><td class="px-4 py-2 text-right">0,00 kg</td></tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <div class="card p-6 lg:col-span-2">
+                         <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-xl font-bold text-gray-800">Geração de Sobras por Setor (kg)</h3>
+                            <button id="btn-ver-todos-setores" class="text-sm font-semibold text-blue-600 hover:text-blue-800">Ver Todos</button>
+                        </div>
+                        <div class="relative h-96">
+                            <canvas id="chart-setores"></canvas>
+                        </div>
+                    </div>
+                    
+                    <div class="card p-6 lg:col-span-1">
+                        <h3 class="text-xl font-bold text-gray-800 mb-4">Distribuição por Bitola (kg)</h3>
+                        <div class="relative h-72"><canvas id="chart-bitolas"></canvas></div>
+                    </div>
+
+                    <div class="card p-6 lg:col-span-3">
+                         <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-xl font-bold text-gray-800">Geração de Sobras por Máquina (kg)</h3>
+                            <button id="btn-ver-todos-maquinas" class="text-sm font-semibold text-blue-600 hover:text-blue-800">Ver Todos</button>
+                        </div>
+                        <div class="relative h-96">
+                            <canvas id="chart-maquinas"></canvas>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div id="detalhes-modal" class="modal fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50 p-4">
+        <div class="card w-full max-w-lg">
+            <div class="p-5 border-b flex justify-between items-center">
+                 <h3 id="detalhes-modal-titulo" class="text-xl font-bold">Detalhes</h3>
+                 <button id="detalhes-modal-close" class="text-gray-400 hover:text-gray-700 text-2xl leading-none">&times;</button>
+            </div>
+            <div class="p-5 max-h-96 overflow-y-auto">
+                <table class="w-full text-sm text-left">
+                    <thead class="bg-gray-50 text-xs text-gray-700 uppercase sticky top-0">
+                        <tr><th id="detalhes-th-nome" scope="col" class="px-4 py-2">Nome</th><th scope="col" class="px-4 py-2 text-right">Peso Total (kg)</th></tr>
+                    </thead>
+                    <tbody id="detalhes-tbody">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js";
+        import { getFirestore, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
+
+        // --- CONFIG FIREBASE ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyCoGyh8PPO6ETGnFKxoBAmkGFyxg0zvF9M",
+            authDomain: "reaproveitamento-60340.firebaseapp.com",
+            projectId: "reaproveitamento-60340",
+            storageBucket: "reaproveitamento-60340.appspot.com",
+            messagingSenderId: "757905842680",
+            appId: "1:757905842680:web:f744ade5197e5f054d760d"
+        };
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // --- COLEÇÕES ---
+        const setoresCollection = collection(db, 'setores');
+        const operadoresCollection = collection(db, 'operadores');
+        const maquinasCollection = collection(db, 'maquinas');
+        const historicoSobrasCollection = collection(db, 'historico_sobras');
+
+        // --- CONSTANTES E VARIÁVEIS ---
+        const dobraFinalCm = { '4.2': 10, '5.0': 10, '6.3': 12, '8.0': 14, '10.0': 16, '12.5': 20, '16.0': 24 };
+        const pesoPorMetroKg = { '4.2': 0.110, '5.0': 0.154, '6.3': 0.245, '8.0': 0.395, '10.0': 0.617, '12.5': 0.963, '16.0': 1.578 };
+        const meses = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
+        let setores = [], operadores = [], maquinas = [], historico = [];
+        let charts = {};
+        let todosOperadores = [], todosSetores = [], todosMaquinas = [];
+
+        // --- ELEMENTOS DO DOM ---
+        const filtroMesEl = document.getElementById('filtro-mes');
+        const filtroAnoEl = document.getElementById('filtro-ano');
+        const emptyStateEl = document.getElementById('empty-state');
+        const dashboardContentEl = document.getElementById('dashboard-content');
+        const detalhesModal = document.getElementById('detalhes-modal');
+
+        // --- FUNÇÕES AUXILIARES ---
+        const calcularPeso = (peca) => {
+            const getFloat = (value) => {
+                const num = parseFloat(value);
+                return isNaN(num) ? 0 : num;
+            };
+
+            let lengthPerUnitCm = 0;
+            if (peca.tipo === 'barra') {
+                lengthPerUnitCm = getFloat(peca.comprimento);
+            } else {
+                let perimetro = 0;
+                if (peca.formato === 'retangular') perimetro = 2 * (getFloat(peca.altura) + getFloat(peca.largura));
+                else if (peca.formato === 'redondo') perimetro = Math.PI * getFloat(peca.diametro);
+                else if (peca.formato === 'triangular') perimetro = getFloat(peca.base) + (getFloat(peca.lado) * 2);
+                lengthPerUnitCm = perimetro + (getFloat(dobraFinalCm[peca.bitola]));
+            }
+            const pesoBaseKgM = getFloat(pesoPorMetroKg[peca.bitola]);
+            return getFloat(peca.quantidade) * (lengthPerUnitCm / 100) * pesoBaseKgM;
+        };
+        
+        const popularFiltros = () => {
+            if (historico.length === 0) return;
+            const datas = historico.map(h => h.createdAt?.toDate()).filter(Boolean);
+            if(datas.length === 0) return;
+            
+            const anos = [...new Set(datas.map(d => d.getFullYear()))].sort((a,b) => b-a);
+            
+            filtroAnoEl.innerHTML = '';
+            anos.forEach(ano => filtroAnoEl.innerHTML += `<option value="${ano}">${ano}</option>`);
+
+            filtroMesEl.innerHTML = '<option value="todos">Todos os meses</option>';
+            meses.forEach((mes, index) => filtroMesEl.innerHTML += `<option value="${index}">${mes}</option>`);
+
+            const dataAtual = new Date();
+            filtroAnoEl.value = dataAtual.getFullYear();
+            filtroMesEl.value = dataAtual.getMonth();
+        };
+
+        const doughnutTextPlugin = {
+            id: 'doughnutText',
+            afterDraw(chart, args, options) {
+                const { ctx, chartArea: { top, width, height } } = chart;
+                if (chart.config.type !== 'doughnut' || !options.text) return;
+
+                const total = chart.data.datasets[0].data.reduce((sum, value) => sum + parseFloat(value), 0);
+                if (total === 0) return;
+
+                ctx.save();
+                ctx.font = `bold ${height / 6}px Inter, sans-serif`;
+                ctx.fillStyle = '#1F2937';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(`${total.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`, width / 2, top + (height / 2) - 10);
+                
+                ctx.font = `500 ${height / 14}px Inter, sans-serif`;
+                ctx.fillStyle = '#6B7280';
+                ctx.fillText('kg', width / 2, top + (height / 2) + 20);
+
+                ctx.restore();
+            }
+        };
+
+        // --- PROCESSAMENTO E RENDERIZAÇÃO ---
+        const processarEDesenharTudo = () => {
+            const mesSelecionado = filtroMesEl.value;
+            const anoSelecionado = parseInt(filtroAnoEl.value);
+
+            const dadosFiltrados = historico.filter(item => {
+                if (!item.createdAt?.toDate) return false;
+                const dataItem = item.createdAt.toDate();
+                const filtroAnoOk = dataItem.getFullYear() === anoSelecionado;
+                const filtroMesOk = (mesSelecionado === 'todos') || (dataItem.getMonth() == mesSelecionado);
+                return filtroAnoOk && filtroMesOk;
+            });
+
+            if (dadosFiltrados.length === 0) {
+                emptyStateEl.classList.remove('hidden');
+                dashboardContentEl.classList.add('hidden');
+                return;
+            }
+            emptyStateEl.classList.add('hidden');
+            dashboardContentEl.classList.remove('hidden');
+
+            const dadosOperador = {}, dadosSetor = {}, dadosMaquina = {}, dadosBitola = {}, resumoPorBitola = {};
+            let pesoTotalGeral = 0;
+            let pecasTotais = 0;
+            
+            dadosFiltrados.forEach(peca => {
+                const peso = calcularPeso(peca);
+                pesoTotalGeral += peso;
+                pecasTotais += peca.quantidade;
+                
+                const operadorNome = operadores.find(o => o.id === peca.operador)?.nome || 'Sem Atribuição';
+                const setorNome = setores.find(s => s.id === peca.setor)?.nome || 'Sem Atribuição';
+                const maquinaNome = maquinas.find(m => m.id === peca.maquina)?.nome || 'Sem Atribuição';
+                const bitola = peca.bitola;
+
+                dadosOperador[operadorNome] = (dadosOperador[operadorNome] || 0) + peso;
+                dadosSetor[setorNome] = (dadosSetor[setorNome] || 0) + peso;
+                dadosMaquina[maquinaNome] = (dadosMaquina[maquinaNome] || 0) + peso;
+                dadosBitola[bitola] = (dadosBitola[bitola] || 0) + peso;
+                resumoPorBitola[bitola] = (resumoPorBitola[bitola] || 0) + peso;
+            });
+
+            todosOperadores = Object.entries(dadosOperador).sort(([,a],[,b]) => b-a);
+            todosSetores = Object.entries(dadosSetor).sort(([,a],[,b]) => b-a);
+            todosMaquinas = Object.entries(dadosMaquina).sort(([,a],[,b]) => b-a);
+            const topBitolas = Object.entries(dadosBitola).sort((a, b) => parseFloat(a[0]) - parseFloat(b[0]));
+            
+            const topOperadoresParaGrafico = todosOperadores.slice(0, 7);
+            const topSetoresParaGrafico = todosSetores.slice(0, 7);
+            const topMaquinasParaGrafico = todosMaquinas.slice(0, 7);
+            
+            document.getElementById('kpi-total-peso').textContent = `${pesoTotalGeral.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2})} kg`;
+            document.getElementById('kpi-total-pecas').textContent = pecasTotais.toLocaleString('pt-BR');
+            document.getElementById('kpi-top-operador').textContent = todosOperadores.length > 0 ? todosOperadores[0][0] : '-';
+            document.getElementById('kpi-top-setor').textContent = todosSetores.length > 0 ? todosSetores[0][0] : '-';
+            document.getElementById('kpi-top-maquina').textContent = todosMaquinas.length > 0 ? todosMaquinas[0][0] : '-';
+
+            const resumoBody = document.getElementById('resumo-tbody');
+            resumoBody.innerHTML = Object.keys(resumoPorBitola).sort((a,b) => parseFloat(a) - parseFloat(b)).map(bitola => `
+                <tr class="border-b hover:bg-gray-50"><td class="px-4 py-2">${bitola} mm</td><td class="px-4 py-2 text-right font-medium">${resumoPorBitola[bitola].toFixed(2).replace('.',',')} kg</td></tr>
+            `).join('');
+            document.getElementById('resumo-tfoot').innerHTML = `<td class="px-4 py-2 text-base">TOTAL</td><td class="px-4 py-2 text-right text-base">${pesoTotalGeral.toFixed(2).replace('.',',')} kg</td>`;
+
+            criarGrafico('chart-operadores', 'bar', topOperadoresParaGrafico.map(item => item[0]), topOperadoresParaGrafico.map(item => item[1]), 'Peso (kg)');
+            criarGrafico('chart-setores', 'bar', topSetoresParaGrafico.map(item => item[0]), topSetoresParaGrafico.map(item => item[1]), 'Peso (kg)');
+            criarGrafico('chart-maquinas', 'bar', topMaquinasParaGrafico.map(item => item[0]), topMaquinasParaGrafico.map(item => item[1]), 'Peso (kg)');
+            criarGrafico('chart-bitolas', 'doughnut', topBitolas.map(item => `${item[0]} mm`), topBitolas.map(item => item[1]), 'Peso (kg)');
+        };
+
+        const criarGrafico = (canvasId, tipo, labels, data, label) => {
+            const ctx = document.getElementById(canvasId).getContext('2d');
+            if (charts[canvasId]) charts[canvasId].destroy();
+
+            const isDoughnut = tipo === 'doughnut';
+            
+            charts[canvasId] = new Chart(ctx, {
+                type: tipo,
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: label,
+                        data: data,
+                        backgroundColor: ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', '#EC4899', '#6B7280'],
+                        borderColor: '#FFFFFF',
+                        borderWidth: isDoughnut ? 2 : 0,
+                        borderRadius: tipo === 'bar' ? 4 : 0,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: tipo === 'bar' ? { y: { beginAtZero: true, grid: { color: '#E5E7EB' } }, x: { grid: { display: false } } } : {},
+                    plugins: { 
+                        legend: { display: isDoughnut, position: 'bottom', labels: { usePointStyle: true, boxWidth: 8 } },
+                        tooltip: { callbacks: { label: (context) => `${context.label}: ${context.parsed.toLocaleString('pt-BR')} kg` } },
+                        doughnutText: { text: true }
+                    },
+                    cutout: isDoughnut ? '65%' : '0%',
+                },
+                plugins: [doughnutTextPlugin]
+            });
+        };
+
+        // --- LÓGICA DO MODAL "VER TODOS" ---
+        const abrirModalDetalhes = (titulo, nomeColuna, dados) => {
+            document.getElementById('detalhes-modal-titulo').textContent = titulo;
+            document.getElementById('detalhes-th-nome').textContent = nomeColuna;
+            const tbody = document.getElementById('detalhes-tbody');
+            tbody.innerHTML = dados.map(item => `
+                <tr class="border-b hover:bg-gray-50">
+                    <td class="px-4 py-2">${item[0]}</td>
+                    <td class="px-4 py-2 text-right font-medium">${item[1].toFixed(2).replace('.',',')} kg</td>
+                </tr>
+            `).join('');
+            detalhesModal.classList.remove('hidden');
+        };
+
+        // --- INICIALIZAÇÃO E EVENT LISTENERS ---
+        filtroMesEl.addEventListener('change', processarEDesenharTudo);
+        filtroAnoEl.addEventListener('change', processarEDesenharTudo);
+        document.getElementById('btn-ver-todos-operadores').addEventListener('click', () => abrirModalDetalhes('Ranking de Operadores', 'Operador', todosOperadores));
+        document.getElementById('btn-ver-todos-setores').addEventListener('click', () => abrirModalDetalhes('Ranking de Setores', 'Setor', todosSetores));
+        document.getElementById('btn-ver-todos-maquinas').addEventListener('click', () => abrirModalDetalhes('Ranking de Máquinas', 'Máquina', todosMaquinas));
+        document.getElementById('detalhes-modal-close').addEventListener('click', () => detalhesModal.classList.add('hidden'));
+
+        let historicoCarregado = false;
+        onSnapshot(historicoSobrasCollection, (snapshot) => {
+            historico = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            if (!historicoCarregado && historico.length > 0) { 
+                popularFiltros();
+                historicoCarregado = true;
+            }
+            processarEDesenharTudo();
+        });
+        onSnapshot(setoresCollection, snapshot => { setores = snapshot.docs.map(d => ({id: d.id, ...d.data()})); if(historico.length > 0) processarEDesenharTudo(); });
+        onSnapshot(operadoresCollection, snapshot => { operadores = snapshot.docs.map(d => ({id: d.id, ...d.data()})); if(historico.length > 0) processarEDesenharTudo(); });
+        onSnapshot(maquinasCollection, snapshot => { maquinas = snapshot.docs.map(d => ({id: d.id, ...d.data()})); if(historico.length > 0) processarEDesenharTudo(); });
+    </script>
+</body>
+</html>

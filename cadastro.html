@@ -29,17 +29,10 @@
             box-shadow: 0 1px 3px 0 rgba(0,0,0,0.05);
             transition: all 0.2s ease-in-out;
         }
-        .card:hover {
-            box-shadow: 0 4px 12px 0 rgba(0,0,0,0.08);
-        }
+        .card:hover { box-shadow: 0 4px 12px 0 rgba(0,0,0,0.08); }
         .btn {
-            padding: 0.65rem 1.25rem;
-            border-radius: 0.5rem;
-            font-weight: 600;
-            transition: all 0.2s;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
+            padding: 0.65rem 1.25rem; border-radius: 0.5rem; font-weight: 600;
+            transition: all 0.2s; display: inline-flex; align-items: center; justify-content: center;
         }
         .btn-primary { background-color: var(--primary-color); color: white; }
         .btn-primary:hover { background-color: var(--primary-hover); }
@@ -49,6 +42,8 @@
         .btn-danger:hover { background-color: #B91C1C; }
         .btn-secondary { background-color: #6B7280; color: white; }
         .btn-secondary:hover { background-color: #4B5563; }
+        .btn-light { background-color: #F3F4F6; color: #1F2937; border: 1px solid #D1D5DB;}
+        .btn-light:hover { background-color: #E5E7EB; }
 
         @media print {
             body > *:not(#relatorio-container) { display: none; }
@@ -64,25 +59,36 @@
 
     <div id="app-container" class="container mx-auto p-4 sm:p-6 lg:p-8">
         <header class="mb-8 pb-4 border-b border-gray-200">
-            <h1 class="text-2xl sm:text-3xl md:text-4xl font-extrabold text-gray-900 flex items-center gap-3">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-blue-600" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" /></svg>
-                Gerenciar Estoque
+            <h1 class="text-2xl sm:text-3xl md:text-4xl font-extrabold text-gray-900">
+                <span class="text-blue-600">Reaproveita</span> | Estoque de Sobras
             </h1>
             <p class="text-gray-500 mt-2">Gerenciamento de sobras de material da Cavicon</p>
         </header>
 
         <main class="space-y-8">
             <div class="card p-4 sm:p-6">
+                <h2 class="text-xl font-bold text-gray-800 mb-4">Cadastros</h2>
+                <div class="flex flex-wrap gap-3">
+                    <button onclick="abrirGerenciador('setores')" class="btn btn-light">Gerenciar Setores</button>
+                    <button onclick="abrirGerenciador('operadores')" class="btn btn-light">Gerenciar Operadores</button>
+                    <button onclick="abrirGerenciador('maquinas')" class="btn btn-light">Gerenciar Máquinas</button>
+                </div>
+            </div>
+
+            <div class="card p-4 sm:p-6">
                 <div class="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4">
                     <h2 class="text-2xl font-bold text-gray-900">Peças em Estoque</h2>
-                    
                     <div id="actions-container" class="flex flex-wrap items-center justify-center sm:justify-end gap-3 w-full sm:w-auto">
-                        <a href="index.html" class="btn btn-secondary flex-shrink-0 no-print">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline-block -ml-1 mr-2" viewBox="0 0 20 20" fill="currentColor">
-                                <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
+                         <a href="dashboard.html" class="btn btn-secondary flex-shrink-0 no-print">
+                            📊 Ver Dashboard
+                        </a>
+                         <a href="index.html" class="btn btn-secondary flex-shrink-0 no-print">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 -ml-1 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
                             </svg>
                             Menu Principal
                         </a>
+                        
                         <div class="flex items-center gap-2 w-full sm:w-auto justify-center">
                             <label for="filtro-bitola" class="text-sm font-medium">Filtrar:</label>
                             <select id="filtro-bitola" class="p-2 border border-gray-300 rounded-lg shadow-sm text-sm focus:ring-blue-500 focus:border-blue-500 flex-grow sm:flex-grow-0"></select>
@@ -93,10 +99,9 @@
                         </button>
                     </div>
                 </div>
-                <div id="lista-pecas" class="flex flex-col gap-4">
-                    </div>
+                <div id="lista-pecas" class="flex flex-col gap-4"></div>
                 <div id="lista-vazia-msg" class="hidden text-center py-16">
-                    <h3 class="mt-4 text-lg font-semibold text-gray-800">Nenhuma peça cadastrada</h3>
+                    <h3 class="mt-4 text-lg font-semibold text-gray-800">Nenhuma peça em estoque</h3>
                     <p class="mt-1 text-sm text-gray-500">Clique em "Adicionar Peça" para começar.</p>
                 </div>
             </div>
@@ -105,53 +110,56 @@
 
     <div id="add-peca-modal" class="modal fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50 p-4">
         <div class="card p-6 w-full max-w-lg form-modal-content">
-            <h3 id="modal-title" class="text-2xl font-bold text-gray-900 mb-4">Adicionar Peça ao Estoque</h3>
+            <h3 id="modal-title" class="text-2xl font-bold text-gray-900 mb-4">Adicionar Peça</h3>
             <form id="peca-form" class="space-y-4">
                 <input type="hidden" name="pecaId" id="pecaId">
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">Tipo</label>
-                        <select name="tipo-peca" class="mt-1 block w-full p-2 border border-gray-300 rounded-md">
-                            <option value="barra">Barra</option><option value="estribo">Estribo</option>
-                        </select>
+                
+                <fieldset class="border rounded-md p-4">
+                    <legend class="text-sm font-medium px-2">Dados da Peça</legend>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                         <div>
+                            <label class="block text-sm font-medium text-gray-700">Tipo</label>
+                            <select name="tipo-peca" class="mt-1 block w-full p-2 border border-gray-300 rounded-md"><option value="barra">Barra</option><option value="estribo">Estribo</option></select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Bitola</label>
+                            <select name="bitola-aco" class="mt-1 block w-full p-2 border border-gray-300 rounded-md"><option value="4.2">4.2 mm</option><option value="5.0">5.0 mm</option><option value="6.3">6.3 mm (1/4")</option><option value="8.0">8.0 mm (5/16")</option><option value="10.0">10.0 mm (3/8")</option><option value="12.5">12.5 mm (1/2")</option><option value="16.0">16.0 mm (5/8")</option></select>
+                        </div>
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-700">Bitola</label>
-                        <select name="bitola-aco" class="mt-1 block w-full p-2 border border-gray-300 rounded-md">
-                            <option value="4.2">4.2 mm</option><option value="5.0">5.0 mm</option><option value="6.3">6.3 mm (1/4")</option><option value="8.0">8.0 mm (5/16")</option><option value="10.0">10.0 mm (3/8")</option><option value="12.5">12.5 mm (1/2")</option><option value="16.0">16.0 mm (5/8")</option>
-                        </select>
+                        <label class="block text-sm font-medium text-gray-700 mt-4">Quantidade</label>
+                        <input type="number" name="quantidade" min="1" required class="mt-1 block w-full p-2 border border-gray-300 rounded-md">
                     </div>
-                </div>
+                    <div id="dimensoes-barra-modal" style="display:none;" class="pt-4"><label class="block text-sm font-medium">Comprimento (cm)</label><input type="number" name="comprimento-barra" min="0" step="0.1" class="mt-1 block w-full p-2 border border-gray-300 rounded-md"></div>
+                    <div id="dimensoes-estribo-modal" style="display:none;" class="pt-4 space-y-4">
+                        <div><label class="block text-sm font-medium">Formato</label><select name="formato-estribo" class="mt-1 block w-full p-2 border border-gray-300 rounded-md"><option value="retangular">Retangular</option><option value="redondo">Redondo</option><option value="triangular">Triangular</option></select></div>
+                        <div id="estribo-retangular-dims-modal" style="display:none;" class="grid grid-cols-1 sm:grid-cols-2 gap-4"><div><label class="block text-sm font-medium">Altura (cm)</label><input type="number" name="estribo-altura" min="0" step="0.1" class="mt-1 block w-full p-2 border"></div><div><label class="block text-sm font-medium">Largura (cm)</label><input type="number" name="estribo-largura" min="0" step="0.1" class="mt-1 block w-full p-2 border"></div></div>
+                        <div id="estribo-redondo-dims-modal" style="display:none;"><label class="block text-sm font-medium">Diâmetro (cm)</label><input type="number" name="estribo-diametro" min="0" step="0.1" class="mt-1 block w-full p-2 border"></div>
+                        <div id="estribo-triangular-dims-modal" style="display:none;" class="grid grid-cols-1 sm:grid-cols-2 gap-4"><div><label class="block text-sm font-medium">Base (cm)</label><input type="number" name="estribo-base" min="0" step="0.1" class="mt-1 block w-full p-2 border"></div><div><label class="block text-sm font-medium">Lado (cm)</label><input type="number" name="estribo-lado" min="0" step="0.1" class="mt-1 block w-full p-2 border"></div></div>
+                    </div>
+                </fieldset>
+
+                <fieldset class="border rounded-md p-4">
+                    <legend class="text-sm font-medium px-2">Vínculos (Opcional)</legend>
+                    <div class="space-y-4">
+                         <div>
+                            <label for="peca-setor" class="block text-sm font-medium text-gray-700">Setor</label>
+                            <select id="peca-setor" name="setor" class="mt-1 block w-full p-2 border border-gray-300 rounded-md"></select>
+                        </div>
+                         <div>
+                            <label for="peca-operador" class="block text-sm font-medium text-gray-700">Operador</label>
+                            <select id="peca-operador" name="operador" class="mt-1 block w-full p-2 border border-gray-300 rounded-md"></select>
+                        </div>
+                         <div>
+                            <label for="peca-maquina" class="block text-sm font-medium text-gray-700">Máquina</label>
+                            <select id="peca-maquina" name="maquina" class="mt-1 block w-full p-2 border border-gray-300 rounded-md"></select>
+                        </div>
+                    </div>
+                </fieldset>
+
                 <div>
-                    <label class="block text-sm font-medium text-gray-700">Quantidade</label>
-                    <input type="number" name="quantidade" min="1" required class="mt-1 block w-full p-2 border border-gray-300 rounded-md">
-                </div>
-                <div id="dimensoes-barra-modal" style="display:none;" class="border-t pt-4">
-                    <label class="block text-sm font-medium">Comprimento (cm)</label>
-                    <input type="number" name="comprimento-barra" min="0" step="0.1" class="mt-1 block w-full p-2 border border-gray-300 rounded-md">
-                </div>
-                <div id="dimensoes-estribo-modal" style="display:none;" class="border-t pt-4 space-y-4">
-                    <div>
-                        <label class="block text-sm font-medium">Formato</label>
-                        <select name="formato-estribo" class="mt-1 block w-full p-2 border border-gray-300 rounded-md">
-                            <option value="retangular">Retangular</option><option value="redondo">Redondo</option><option value="triangular">Triangular</option>
-                        </select>
-                    </div>
-                    <div id="estribo-retangular-dims-modal" style="display:none;" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div><label class="block text-sm font-medium">Altura (cm)</label><input type="number" name="estribo-altura" min="0" step="0.1" class="mt-1 block w-full p-2 border"></div>
-                        <div><label class="block text-sm font-medium">Largura (cm)</label><input type="number" name="estribo-largura" min="0" step="0.1" class="mt-1 block w-full p-2 border"></div>
-                    </div>
-                     <div id="estribo-redondo-dims-modal" style="display:none;">
-                        <label class="block text-sm font-medium">Diâmetro (cm)</label><input type="number" name="estribo-diametro" min="0" step="0.1" class="mt-1 block w-full p-2 border">
-                    </div>
-                    <div id="estribo-triangular-dims-modal" style="display:none;" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                         <div><label class="block text-sm font-medium">Base (cm)</label><input type="number" name="estribo-base" min="0" step="0.1" class="mt-1 block w-full p-2 border"></div>
-                        <div><label class="block text-sm font-medium">Lado (cm)</label><input type="number" name="estribo-lado" min="0" step="0.1" class="mt-1 block w-full p-2 border"></div>
-                    </div>
-                </div>
-                <div class="border-t pt-4">
                     <label for="observacao" class="block text-sm font-medium text-gray-700">Observação</label>
-                    <textarea name="observacao" id="observacao" rows="3" class="mt-1 block w-full p-2 border border-gray-300 rounded-md" placeholder="Ex: Peça levemente enferrujada, ponta amassada..."></textarea>
+                    <textarea name="observacao" id="observacao" rows="3" class="mt-1 block w-full p-2 border border-gray-300 rounded-md" placeholder="Ex: Peça levemente enferrujada..."></textarea>
                 </div>
             </form>
             <div class="mt-6 flex justify-end gap-3">
@@ -163,8 +171,8 @@
     
     <div id="confirm-modal" class="modal fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50 p-4">
         <div class="card p-6 w-full max-w-md text-center">
-            <h3 class="text-lg font-semibold text-gray-900 mt-4">Excluir Peça</h3>
-            <p class="text-sm text-gray-500 mt-2">Tem certeza? Esta ação não pode ser desfeita.</p>
+            <h3 class="text-lg font-semibold text-gray-900 mt-4">Excluir</h3>
+            <p id="confirm-modal-text" class="text-sm text-gray-500 mt-2">Tem certeza? Esta ação não pode ser desfeita.</p>
             <div class="items-center mt-6 flex justify-center gap-4">
                 <button id="confirm-cancel-btn" class="btn bg-gray-200 text-gray-800 w-28">Cancelar</button>
                 <button id="confirm-delete-btn" class="btn btn-danger w-28">Excluir</button>
@@ -172,9 +180,25 @@
         </div>
     </div>
 
+    <div id="gerenciar-entidade-modal" class="modal fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50 p-4">
+        <div class="card p-6 w-full max-w-md">
+            <h3 id="gerenciar-entidade-titulo" class="text-2xl font-bold text-gray-900 mb-4">Gerenciar</h3>
+            <form id="gerenciar-entidade-form" class="flex gap-2 mb-4">
+                <input type="hidden" id="gerenciar-entidade-id">
+                <input type="text" id="gerenciar-entidade-nome" class="flex-grow p-2 border border-gray-300 rounded-md" placeholder="Nome do item" required>
+                <button type="submit" class="btn btn-success">Salvar</button>
+            </form>
+            <div id="gerenciar-entidade-lista" class="space-y-2 max-h-60 overflow-y-auto">
+            </div>
+            <div class="mt-6 flex justify-end">
+                 <button onclick="document.getElementById('gerenciar-entidade-modal').classList.add('hidden')" type="button" class="btn bg-gray-200 text-gray-800 hover:bg-gray-300">Fechar</button>
+            </div>
+        </div>
+    </div>
+
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js";
-        import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, doc, updateDoc } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
+        import { getFirestore, collection, onSnapshot, deleteDoc, doc, updateDoc, serverTimestamp, setDoc } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyCoGyh8PPO6ETGnFKxoBAmkGFyxg0zvF9M",
@@ -184,16 +208,23 @@
             messagingSenderId: "757905842680",
             appId: "1:757905842680:web:f744ade5197e5f054d760d"
         };
+
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
+
         const pecasCollection = collection(db, 'pecas');
+        const setoresCollection = collection(db, 'setores');
+        const operadoresCollection = collection(db, 'operadores');
+        const maquinasCollection = collection(db, 'maquinas');
+        const historicoSobrasCollection = collection(db, 'historico_sobras');
 
         const dobraFinalCm = { '4.2': 10, '5.0': 10, '6.3': 12, '8.0': 14, '10.0': 16, '12.5': 20, '16.0': 24 };
         const pesoPorMetroKg = { '4.2': 0.110, '5.0': 0.154, '6.3': 0.245, '8.0': 0.395, '10.0': 0.617, '12.5': 0.963, '16.0': 1.578 };
 
-        let pecas = [];
+        let pecas = [], setores = [], operadores = [], maquinas = [];
         let filtroBitolaAtual = 'todas';
         let idParaExcluir = null;
+        let colecaoParaExcluir = '';
 
         const listaPecasContainer = document.getElementById('lista-pecas');
         const listaVaziaMsg = document.getElementById('lista-vazia-msg');
@@ -201,14 +232,6 @@
         const addPecaModal = document.getElementById('add-peca-modal');
         const confirmModal = document.getElementById('confirm-modal');
         const pecaForm = document.getElementById('peca-form');
-        
-        const formatarDimensoes = (peca) => {
-            if (peca.tipo === 'barra') return `Comp: ${peca.comprimento?.toFixed(1)} cm`;
-            if (peca.formato === 'retangular') return `${peca.altura?.toFixed(1)} x ${peca.largura?.toFixed(1)} cm`;
-            if (peca.formato === 'redondo') return `Ø ${peca.diametro?.toFixed(1)} cm`;
-            if (peca.formato === 'triangular') return `B: ${peca.base?.toFixed(1)} L: ${peca.lado?.toFixed(1)} cm`;
-            return '-';
-        };
 
         const calcularMedidas = (peca) => {
             let lengthPerUnitCm = 0;
@@ -225,7 +248,7 @@
             const pesoTotalKg = (peca.quantidade || 0) * (lengthPerUnitCm / 100) * pesoBaseKgM;
             return { lengthPerUnitCm, pesoTotalKg };
         };
-
+        
         const gerarDesenhoSvg = (peca, containerClasses = '', viewBoxSize = 100) => {
             if (!peca) return '';
             let svgShape = '', svgDimensions = '';
@@ -249,25 +272,29 @@
                     const b = peca.base || 1; const s = peca.lado || 1; const h = Math.sqrt(s*s - (b/2)*(b/2)) || s; const scale = size / Math.max(b,h);
                     const sb = b*scale; const sh = h*scale; const p1x = (viewBoxSize-sb)/2; const p1y = (viewBoxSize+sh)/2; const p2x = p1x+sb; const p2y = p1y; const p3x = viewBoxSize/2; const p3y = p1y-sh;
                     svgShape = `<polygon points="${p1x},${p1y} ${p2x},${p2y} ${p3x},${p3y}" stroke="#4B5563" stroke-width="2.5" fill="none" />`;
-                    svgDimensions = `
-                        <text class="blueprint-text" x="${p3x}" y="${p1y + 12}" text-anchor="middle">${b}cm</text>
-                        <text class="blueprint-text" x="${(p1x + p3x) / 2 - 10}" y="${(p1y + p3y) / 2}" text-anchor="end" dominant-baseline="middle">${s}cm</text>
-                    `;
+                    svgDimensions = `<text class="blueprint-text" x="${p3x}" y="${p1y + 12}" text-anchor="middle">${b}cm</text><text class="blueprint-text" x="${(p1x + p3x) / 2 - 10}" y="${(p1y + p3y) / 2}" text-anchor="end" dominant-baseline="middle">${s}cm</text>`;
                 }
             }
             return `<svg viewBox="0 0 ${viewBoxSize} ${viewBoxSize}" class="w-full h-full ${containerClasses}">${svgShape}${svgDimensions}</svg>`;
         };
-        
+
         const renderizarPecas = () => {
             listaPecasContainer.innerHTML = '';
-            const pecasFiltradas = filtroBitolaAtual === 'todas' ? pecas : pecas.filter(p => p.bitola === filtroBitolaAtual);
+            const pecasAtivas = pecas.filter(p => p.quantidade > 0);
+            const pecasFiltradas = filtroBitolaAtual === 'todas' ? pecasAtivas : pecasAtivas.filter(p => p.bitola === filtroBitolaAtual);
+            
             listaVaziaMsg.classList.toggle('hidden', pecasFiltradas.length > 0);
             
             pecasFiltradas.sort((a,b) => (a.comprimento || a.altura) - (b.comprimento || b.altura)).forEach(peca => {
                 const { lengthPerUnitCm, pesoTotalKg } = calcularMedidas(peca);
                 const card = document.createElement('div');
-                // AJUSTE: O card agora é flex-col e centralizado em mobile, e flex-row em telas médias (md) e maiores.
                 card.className = 'card flex flex-col items-center md:flex-row md:items-start p-4 gap-6';
+
+                const setor = setores.find(s => s.id === peca.setor)?.nome || 'N/D';
+                const operador = operadores.find(o => o.id === peca.operador)?.nome || 'N/D';
+                // *** MUDANÇA: Adiciona a busca pelo nome da máquina ***
+                const maquina = maquinas.find(m => m.id === peca.maquina)?.nome || 'N/D';
+
                 card.innerHTML = `
                     <div class="w-28 h-28 md:w-32 md:h-32 lg:w-40 lg:h-40 flex-shrink-0 bg-gray-50 rounded-lg p-2 no-print">${gerarDesenhoSvg(peca)}</div>
                     <div class="flex-1 w-full text-center md:text-left">
@@ -275,36 +302,48 @@
                             <h3 class="text-xl font-bold capitalize text-gray-800">${peca.tipo} ${peca.formato || ''}</h3>
                             <span class="bg-blue-100 text-blue-800 text-xs font-semibold px-2.5 py-0.5 rounded-full">${peca.bitola} mm</span>
                         </div>
-                        <p class="text-gray-600 mt-2">${formatarDimensoes(peca)}</p>
+                        <p class="text-gray-600 mt-2">${peca.tipo === 'barra' ? `Comp: ${peca.comprimento?.toFixed(1)} cm` : peca.formato === 'retangular' ? `${peca.altura?.toFixed(1)} x ${peca.largura?.toFixed(1)} cm` : peca.formato === 'redondo' ? `Ø ${peca.diametro?.toFixed(1)} cm` : `B: ${peca.base?.toFixed(1)} L: ${peca.lado?.toFixed(1)} cm`}</p>
+                        
+                        <div class="text-xs text-gray-500 mt-2 flex flex-wrap gap-x-2 justify-center md:justify-start">
+                           <span><strong>Setor:</strong> ${setor}</span>
+                           <span class="hidden sm:inline">|</span>
+                           <span><strong>Operador:</strong> ${operador}</span>
+                           <span class="hidden sm:inline">|</span>
+                           <span><strong>Máquina:</strong> ${maquina}</span>
+                        </div>
                         
                         ${peca.observacao ? `<p class="text-sm text-amber-700 bg-amber-50 rounded p-2 mt-3 italic text-left"><strong>Obs:</strong> ${peca.observacao}</p>` : ''}
                         
                         <div class="mt-4 grid grid-cols-3 gap-4 text-center border-t pt-3">
-                            <div>
-                                <p class="text-sm font-medium text-gray-500">Quantidade</p>
-                                <p class="text-2xl font-bold text-blue-600">${peca.quantidade}</p>
-                            </div>
-                            <div>
-                                <p class="text-sm font-medium text-gray-500">Comp. Unit.</p>
-                                <p class="text-lg font-semibold text-gray-700">${lengthPerUnitCm.toFixed(1)} cm</p>
-                            </div>
-                            <div>
-                                <p class="text-sm font-medium text-gray-500">Peso Total</p>
-                                <p class="text-lg font-semibold text-gray-700">${pesoTotalKg.toFixed(2)} kg</p>
-                            </div>
+                            <div><p class="text-sm font-medium text-gray-500">Quantidade</p><p class="text-2xl font-bold text-blue-600">${peca.quantidade}</p></div>
+                            <div><p class="text-sm font-medium text-gray-500">Comp. Unit.</p><p class="text-lg font-semibold text-gray-700">${lengthPerUnitCm.toFixed(1)} cm</p></div>
+                            <div><p class="text-sm font-medium text-gray-500">Peso Total</p><p class="text-lg font-semibold text-gray-700">${pesoTotalKg.toFixed(2)} kg</p></div>
                         </div>
                     </div>
                     <div class="flex flex-row md:flex-col gap-2 no-print">
-                        <button data-id="${peca.id}" class="editar-btn text-gray-400 hover:text-blue-600 p-2 rounded-full hover:bg-blue-100 transition-colors">
-                           <svg class="h-6 w-6"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round">  <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />  <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" /></svg>
-                        </button>
-                        <button data-id="${peca.id}" class="remover-btn text-gray-400 hover:text-red-600 p-2 rounded-full hover:bg-red-100 transition-colors">
-                            <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
-                        </button>
+                        <button data-id="${peca.id}" class="editar-btn text-gray-400 hover:text-blue-600 p-2 rounded-full hover:bg-blue-100 transition-colors"><svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" /><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" /></svg></button>
+                        <button data-id="${peca.id}" class="remover-btn text-gray-400 hover:text-red-600 p-2 rounded-full hover:bg-red-100 transition-colors"><svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg></button>
                     </div>
                 `;
                 listaPecasContainer.appendChild(card);
             });
+        };
+
+        const popularSelects = () => {
+            const selects = {
+                'peca-setor': setores,
+                'peca-operador': operadores,
+                'peca-maquina': maquinas
+            };
+            for (const id in selects) {
+                const selectEl = document.getElementById(id);
+                const valorAtual = selectEl.value;
+                selectEl.innerHTML = '<option value="">Nenhum</option>';
+                selects[id].sort((a,b) => a.nome.localeCompare(b.nome)).forEach(item => {
+                    selectEl.innerHTML += `<option value="${item.id}">${item.nome}</option>`;
+                });
+                selectEl.value = valorAtual;
+            }
         };
 
         const toggleCamposDinamicosModal = () => {
@@ -319,18 +358,18 @@
             }
         };
 
-        // --- Event Listeners ---
         document.getElementById('show-form-btn').addEventListener('click', () => {
             pecaForm.reset();
             document.getElementById('pecaId').value = ''; 
             document.getElementById('modal-title').textContent = 'Adicionar Peça ao Estoque';
             document.getElementById('modal-save-btn').textContent = 'Salvar Peça';
+            popularSelects();
             toggleCamposDinamicosModal();
             addPecaModal.classList.remove('hidden');
         });
         document.getElementById('modal-cancel-btn').addEventListener('click', () => addPecaModal.classList.add('hidden'));
         pecaForm.addEventListener('change', toggleCamposDinamicosModal);
-        
+
         document.getElementById('modal-save-btn').addEventListener('click', async () => {
             const formData = new FormData(pecaForm);
             const pecaId = formData.get('pecaId');
@@ -339,31 +378,36 @@
                 tipo: formData.get('tipo-peca'), 
                 bitola: formData.get('bitola-aco'),
                 quantidade: parseInt(formData.get('quantidade'), 10),
-                observacao: formData.get('observacao').trim()
+                observacao: formData.get('observacao').trim(),
+                setor: formData.get('setor') || null,
+                operador: formData.get('operador') || null,
+                maquina: formData.get('maquina') || null
             };
             if (!dadosPeca.quantidade || dadosPeca.quantidade < 1) return alert('Insira uma quantidade válida.');
 
-            if (dadosPeca.tipo === 'barra') {
-                dadosPeca.comprimento = parseFloat(formData.get('comprimento-barra'));
-            } else {
+            if (dadosPeca.tipo === 'barra') dadosPeca.comprimento = parseFloat(formData.get('comprimento-barra'));
+            else {
                 dadosPeca.formato = formData.get('formato-estribo');
-                if (dadosPeca.formato === 'retangular') {
-                    dadosPeca.altura = parseFloat(formData.get('estribo-altura'));
-                    dadosPeca.largura = parseFloat(formData.get('estribo-largura'));
-                } else if (dadosPeca.formato === 'redondo') {
-                    dadosPeca.diametro = parseFloat(formData.get('estribo-diametro'));
-                } else if (dadosPeca.formato === 'triangular') {
-                    dadosPeca.base = parseFloat(formData.get('estribo-base'));
-                    dadosPeca.lado = parseFloat(formData.get('estribo-lado'));
-                }
+                if (dadosPeca.formato === 'retangular') { dadosPeca.altura = parseFloat(formData.get('estribo-altura')); dadosPeca.largura = parseFloat(formData.get('estribo-largura')); }
+                else if (dadosPeca.formato === 'redondo') { dadosPeca.diametro = parseFloat(formData.get('estribo-diametro')); }
+                else if (dadosPeca.formato === 'triangular') { dadosPeca.base = parseFloat(formData.get('estribo-base')); dadosPeca.lado = parseFloat(formData.get('estribo-lado')); }
             }
             
             try {
                 if (pecaId) {
                     const pecaRef = doc(db, 'pecas', pecaId);
                     await updateDoc(pecaRef, dadosPeca);
+
+                    const historicoRef = doc(db, 'historico_sobras', pecaId);
+                    await setDoc(historicoRef, { ...dadosPeca, createdAt: serverTimestamp() }, { merge: true });
                 } else {
-                    await addDoc(pecasCollection, dadosPeca);
+                    const novaPecaRef = doc(pecasCollection);
+                    
+                    await setDoc(novaPecaRef, dadosPeca); 
+                    
+                    const dadosHistorico = { ...dadosPeca, createdAt: serverTimestamp() };
+                    const historicoRef = doc(db, 'historico_sobras', novaPecaRef.id);
+                    await setDoc(historicoRef, dadosHistorico);
                 }
                 addPecaModal.classList.add('hidden');
             } catch (e) { 
@@ -371,38 +415,6 @@
                 alert("Erro ao salvar a peça."); 
             }
         });
-        
-        const abrirModalParaEdicao = (id) => {
-            const pecaParaEditar = pecas.find(p => p.id === id);
-            if (!pecaParaEditar) return;
-
-            pecaForm.querySelector('[name="pecaId"]').value = pecaParaEditar.id;
-            pecaForm.querySelector('[name="tipo-peca"]').value = pecaParaEditar.tipo;
-            pecaForm.querySelector('[name="bitola-aco"]').value = pecaParaEditar.bitola;
-            pecaForm.querySelector('[name="quantidade"]').value = pecaParaEditar.quantidade;
-            pecaForm.querySelector('[name="observacao"]').value = pecaParaEditar.observacao || '';
-            
-            if (pecaParaEditar.tipo === 'barra') {
-                pecaForm.querySelector('[name="comprimento-barra"]').value = pecaParaEditar.comprimento;
-            } else if (pecaParaEditar.tipo === 'estribo') {
-                pecaForm.querySelector('[name="formato-estribo"]').value = pecaParaEditar.formato;
-                if (pecaParaEditar.formato === 'retangular') {
-                    pecaForm.querySelector('[name="estribo-altura"]').value = pecaParaEditar.altura;
-                    pecaForm.querySelector('[name="estribo-largura"]').value = pecaParaEditar.largura;
-                } else if (pecaParaEditar.formato === 'redondo') {
-                    pecaForm.querySelector('[name="estribo-diametro"]').value = pecaParaEditar.diametro;
-                } else if (pecaParaEditar.formato === 'triangular') {
-                    pecaForm.querySelector('[name="estribo-base"]').value = pecaParaEditar.base;
-                    pecaForm.querySelector('[name="estribo-lado"]').value = pecaParaEditar.lado;
-                }
-            }
-
-            document.getElementById('modal-title').textContent = 'Editar Peça';
-            document.getElementById('modal-save-btn').textContent = 'Salvar Alterações';
-
-            toggleCamposDinamicosModal();
-            addPecaModal.classList.remove('hidden');
-        };
 
         listaPecasContainer.addEventListener('click', (e) => {
             const removeButton = e.target.closest('.remover-btn');
@@ -410,122 +422,120 @@
 
             if (removeButton) {
                 idParaExcluir = removeButton.dataset.id;
+                colecaoParaExcluir = 'pecas';
+                document.getElementById('confirm-modal-text').textContent = 'Tem certeza que deseja excluir esta peça? A ação não pode ser desfeita.'
                 confirmModal.classList.remove('hidden');
             } else if (editButton) {
-                const idParaEditar = editButton.dataset.id;
-                abrirModalParaEdicao(idParaEditar);
+                const pecaParaEditar = pecas.find(p => p.id === editButton.dataset.id);
+                if (!pecaParaEditar) return;
+
+                pecaForm.querySelector('[name="pecaId"]').value = pecaParaEditar.id;
+                pecaForm.querySelector('[name="tipo-peca"]').value = pecaParaEditar.tipo;
+                pecaForm.querySelector('[name="bitola-aco"]').value = pecaParaEditar.bitola;
+                pecaForm.querySelector('[name="quantidade"]').value = pecaParaEditar.quantidade;
+                pecaForm.querySelector('[name="observacao"]').value = pecaParaEditar.observacao || '';
+                pecaForm.querySelector('[name="setor"]').value = pecaParaEditar.setor || '';
+                pecaForm.querySelector('[name="operador"]').value = pecaParaEditar.operador || '';
+                pecaForm.querySelector('[name="maquina"]').value = pecaParaEditar.maquina || '';
+                
+                if (pecaParaEditar.tipo === 'barra') pecaForm.querySelector('[name="comprimento-barra"]').value = pecaParaEditar.comprimento;
+                else if (pecaParaEditar.tipo === 'estribo') {
+                    pecaForm.querySelector('[name="formato-estribo"]').value = pecaParaEditar.formato;
+                    if (pecaParaEditar.formato === 'retangular') { pecaForm.querySelector('[name="estribo-altura"]').value = pecaParaEditar.altura; pecaForm.querySelector('[name="estribo-largura"]').value = pecaParaEditar.largura; }
+                    else if (pecaParaEditar.formato === 'redondo') { pecaForm.querySelector('[name="estribo-diametro"]').value = pecaParaEditar.diametro; }
+                    else if (pecaParaEditar.formato === 'triangular') { pecaForm.querySelector('[name="estribo-base"]').value = pecaParaEditar.base; pecaForm.querySelector('[name="estribo-lado"]').value = pecaParaEditar.lado; }
+                }
+                document.getElementById('modal-title').textContent = 'Editar Peça';
+                document.getElementById('modal-save-btn').textContent = 'Salvar Alterações';
+                toggleCamposDinamicosModal();
+                addPecaModal.classList.remove('hidden');
             }
         });
 
         document.getElementById('confirm-cancel-btn').addEventListener('click', () => confirmModal.classList.add('hidden'));
         document.getElementById('confirm-delete-btn').addEventListener('click', async () => {
-            if (idParaExcluir) {
-                try { await deleteDoc(doc(db, 'pecas', idParaExcluir)); } 
-                catch (e) { console.error(e); } 
-                finally { confirmModal.classList.add('hidden'); idParaExcluir = null; }
+            if (idParaExcluir && colecaoParaExcluir) {
+                try { 
+                    await deleteDoc(doc(db, colecaoParaExcluir, idParaExcluir));
+                } 
+                catch (e) { console.error("Erro ao excluir:", e); alert("Ocorreu um erro ao excluir."); } 
+                finally { confirmModal.classList.add('hidden'); idParaExcluir = null; colecaoParaExcluir = ''; }
             }
         });
+
+        let tipoEntidadeAtual = '';
+        let colecaoEntidadeAtual = null;
+        let listaEntidadeAtual = [];
+
+        const colecoesMap = {
+            'setores': { ref: setoresCollection, lista: () => setores, nome: 'Setor' },
+            'operadores': { ref: operadoresCollection, lista: () => operadores, nome: 'Operador' },
+            'maquinas': { ref: maquinasCollection, lista: () => maquinas, nome: 'Máquina' },
+        };
+
+        window.abrirGerenciador = (tipo) => {
+            tipoEntidadeAtual = tipo;
+            const config = colecoesMap[tipo];
+            colecaoEntidadeAtual = config.ref;
+            listaEntidadeAtual = config.lista();
+
+            document.getElementById('gerenciar-entidade-titulo').textContent = `Gerenciar ${tipo.charAt(0).toUpperCase() + tipo.slice(1)}`;
+            document.getElementById('gerenciar-entidade-form').reset();
+            document.getElementById('gerenciar-entidade-id').value = '';
+            renderizarListaEntidades();
+            document.getElementById('gerenciar-entidade-modal').classList.remove('hidden');
+        }
+
+        const renderizarListaEntidades = () => {
+            const container = document.getElementById('gerenciar-entidade-lista');
+            container.innerHTML = '';
+            listaEntidadeAtual.sort((a,b) => a.nome.localeCompare(b.nome)).forEach(item => {
+                container.innerHTML += `
+                    <div class="flex items-center justify-between p-2 bg-gray-50 rounded-md">
+                        <span class="text-gray-800">${item.nome}</span>
+                        <div class="flex gap-2">
+                             <button onclick="editarEntidade('${item.id}')" class="text-gray-400 hover:text-blue-600">&#9998;</button>
+                             <button onclick="excluirEntidade('${item.id}')" class="text-gray-400 hover:text-red-600">&#10006;</button>
+                        </div>
+                    </div>`;
+            });
+        };
+
+        document.getElementById('gerenciar-entidade-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const id = document.getElementById('gerenciar-entidade-id').value;
+            const nome = document.getElementById('gerenciar-entidade-nome').value.trim();
+            if (!nome || !colecaoEntidadeAtual) return;
+
+            const dados = { nome };
+            try {
+                if (id) { await updateDoc(doc(colecaoEntidadeAtual, id), dados); } 
+                else { await setDoc(doc(colecaoEntidadeAtual), dados); }
+                document.getElementById('gerenciar-entidade-form').reset();
+                document.getElementById('gerenciar-entidade-id').value = '';
+            } catch (error) { console.error("Erro ao salvar entidade:", error); }
+        });
+
+        window.editarEntidade = (id) => {
+            const item = listaEntidadeAtual.find(i => i.id === id);
+            if (item) {
+                document.getElementById('gerenciar-entidade-id').value = item.id;
+                document.getElementById('gerenciar-entidade-nome').value = item.nome;
+            }
+        };
+
+        window.excluirEntidade = (id) => {
+            idParaExcluir = id;
+            colecaoParaExcluir = tipoEntidadeAtual;
+            document.getElementById('confirm-modal-text').textContent = `Tem certeza que deseja excluir este item? A ação não pode ser desfeita.`
+            confirmModal.classList.remove('hidden');
+        };
 
         filtroBitolaSelect.addEventListener('change', (e) => {
             filtroBitolaAtual = e.target.value;
             renderizarPecas();
         });
 
-        // --- Lógica do Relatório ---
-        const initRelatorio = () => {
-            let relatorioBtn = document.getElementById('relatorio-btn');
-            if(relatorioBtn) return;
-            
-            relatorioBtn = document.createElement('button');
-            relatorioBtn.id = 'relatorio-btn';
-            relatorioBtn.textContent = 'Gerar Relatório';
-            relatorioBtn.className = 'btn btn-secondary no-print w-full sm:w-auto'; // Ajuste de largura
-            relatorioBtn.addEventListener('click', gerarRelatorio);
-            document.getElementById('actions-container').appendChild(relatorioBtn);
-        };
-        
-        const gerarRelatorio = () => {
-            if (pecas.length === 0) return alert("Não há peças para gerar um relatório.");
-            
-            const groupedPecas = { barra: {}, estribo: {} };
-            pecas.forEach(peca => {
-                const tipo = peca.tipo;
-                const bitola = peca.bitola;
-                if (!groupedPecas[tipo]) groupedPecas[tipo] = {};
-                if (!groupedPecas[tipo][bitola]) groupedPecas[tipo][bitola] = [];
-                groupedPecas[tipo][bitola].push(peca);
-            });
-
-            let pecasHtml = '';
-            ['barra', 'estribo'].forEach(tipo => {
-                const bitolas = Object.keys(groupedPecas[tipo]).sort((a, b) => parseFloat(a) - parseFloat(b));
-                if (bitolas.length > 0) {
-                    pecasHtml += `<section class="mb-8 page-break">`;
-                    pecasHtml += `<h2 class="text-2xl font-extrabold text-gray-800 mb-4 capitalize border-b-2 pb-2">${tipo}s</h2>`;
-                    bitolas.forEach(bitola => {
-                        pecasHtml += `<h3 class="text-lg font-bold text-gray-700 mt-4 mb-2">Bitola ${bitola} mm</h3>`;
-                        pecasHtml += `<div class="flex flex-col gap-4">`;
-                        groupedPecas[tipo][bitola].forEach(peca => {
-                            const { lengthPerUnitCm, pesoTotalKg } = calcularMedidas(peca);
-                            pecasHtml += `
-                                <div class="card-print flex items-center p-3 border rounded-lg gap-4">
-                                    <div class="w-24 h-24 flex-shrink-0 bg-gray-100 rounded-md p-1">${gerarDesenhoSvg(peca)}</div>
-                                    <div class="flex-1">
-                                        <p class="font-bold capitalize">${peca.tipo} ${peca.formato || ''}</p>
-                                        <p class="text-sm text-gray-600">${formatarDimensoes(peca)}</p>
-                                        ${peca.observacao ? `<p class="text-xs text-amber-800 mt-1 italic">Obs: ${peca.observacao}</p>` : ''}
-                                        <div class="mt-2 grid grid-cols-3 gap-2 text-sm text-center border-t pt-2">
-                                            <div><span class="font-medium text-gray-500 block">Qtd</span><span class="font-bold text-lg">${peca.quantidade}</span></div>
-                                            <div><span class="font-medium text-gray-500 block">Comp.</span><span class="font-semibold">${lengthPerUnitCm.toFixed(1)} cm</span></div>
-                                            <div><span class="font-medium text-gray-500 block">Peso</span><span class="font-semibold">${pesoTotalKg.toFixed(2)} kg</span></div>
-                                        </div>
-                                    </div>
-                                </div>`;
-                        });
-                        pecasHtml += `</div>`;
-                    });
-                    pecasHtml += `</section>`;
-                }
-            });
-
-            const resumoPorBitola = {};
-            let pesoTotalGeral = 0;
-            pecas.forEach(p => {
-                const { pesoTotalKg } = calcularMedidas(p);
-                resumoPorBitola[p.bitola] = (resumoPorBitola[p.bitola] || 0) + pesoTotalKg;
-                pesoTotalGeral += pesoTotalKg;
-            });
-            let resumoHtml = Object.keys(resumoPorBitola).sort((a,b) => parseFloat(a)-parseFloat(b)).map(bitola => `
-                <tr class="border-b"><td class="p-2">${bitola} mm</td><td class="p-2 text-right font-bold">${resumoPorBitola[bitola].toFixed(2)} kg</td></tr>
-            `).join('');
-
-            const relatorioHtml = `
-                <div class="p-8 bg-white">
-                    <header class="text-center mb-10"><h1 class="text-3xl font-extrabold text-gray-900">Relatório de Inventário</h1><p class="text-sm text-gray-500">Gerado em: ${new Date().toLocaleString('pt-BR')}</p></header>
-                    ${pecasHtml}
-                    <section>
-                        <h2 class="text-xl font-bold mb-4 border-b-2 pb-2">Resumo de Peso</h2>
-                        <table class="w-full max-w-md text-base">
-                            <thead class="bg-gray-100"><tr class="text-left"><th class="p-2">Bitola</th><th class="p-2 text-right">Peso (kg)</th></tr></thead>
-                            <tbody>${resumoHtml}</tbody>
-                            <tfoot class="border-t-2 border-gray-500">
-                                <tr><td class="p-2 font-bold text-lg">PESO TOTAL GERAL</td><td class="p-2 text-right font-extrabold text-lg">${pesoTotalGeral.toFixed(2)} kg</td></tr>
-                            </tfoot>
-                        </table>
-                    </section>
-                </div>`;
-            
-            let rc = document.getElementById('relatorio-container');
-            if (rc) rc.remove();
-            rc = document.createElement('div');
-            rc.id = 'relatorio-container';
-            rc.innerHTML = relatorioHtml;
-            document.body.appendChild(rc);
-            
-            setTimeout(() => window.print(), 50);
-        };
-
-        // --- Inicialização ---
         onSnapshot(pecasCollection, (snapshot) => {
             pecas = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
             const bitolas = [...new Set(pecas.map(p => p.bitola))].sort((a,b) => parseFloat(a) - parseFloat(b));
@@ -533,8 +543,11 @@
             bitolas.forEach(b => filtroBitolaSelect.innerHTML += `<option value="${b}">${b} mm</option>`);
             filtroBitolaSelect.value = filtroBitolaAtual;
             renderizarPecas();
-            initRelatorio();
         });
+
+        onSnapshot(setoresCollection, snapshot => { setores = snapshot.docs.map(d => ({id: d.id, ...d.data()})); popularSelects(); if(tipoEntidadeAtual === 'setores') renderizarListaEntidades(); renderizarPecas(); });
+        onSnapshot(operadoresCollection, snapshot => { operadores = snapshot.docs.map(d => ({id: d.id, ...d.data()})); popularSelects(); if(tipoEntidadeAtual === 'operadores') renderizarListaEntidades(); renderizarPecas(); });
+        onSnapshot(maquinasCollection, snapshot => { maquinas = snapshot.docs.map(d => ({id: d.id, ...d.data()})); popularSelects(); if(tipoEntidadeAtual === 'maquinas') renderizarListaEntidades(); renderizarPecas(); });
     </script>
 </body>
 </html>
